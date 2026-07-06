@@ -1,0 +1,10 @@
+{
+  "include": ["ts/**/*"],
+  "target": "ES6",
+
+  "compilerOptions": {
+    "types": ["node"],
+    "composite": true,
+    "declaration": true,
+  }
+}
