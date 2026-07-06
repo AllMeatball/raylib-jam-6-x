@@ -44,14 +44,18 @@ const texture = new RL_Texture("gfx/wizzy.png");
 texture.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
 
 function ENGINE_Draw() {
-    RL_ClearBackground(chroma('lime').darken( Math.abs(Math.sin(timer * 2.0)) * 2 ).rgb());
+    RL_ClearBackground(chroma('coral').rgb());
+
+    if (RL_IsKeyDown(RL_KeyboardKey.KEY_LEFT)) {
+        console.log("left");
+    }
 
     const pos = RL_GetMousePosition();
     // pos.x += Math.cos(timer * 8.0) * 16;
     pos.y += Math.sin(timer * 12.0) * 8;
 
     // canvas_tex.draw(pos, 0, 1, chroma('white').rgb());
-    texture.draw(pos, Math.cos(timer * 8.0) * 2, 0.15, chroma('white').rgb());
+    texture.draw(pos, Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
 
     RL_DrawFPS();
 }
