@@ -35,9 +35,9 @@ JSValue CLASSGET_RL_Texture(JSContext *ctx, JSValueConst this_val, int magic)
             return JS_NewUint32(ctx, texture->id);
         case 4:
             return JS_NewInt32(ctx, texture->mipmaps);
-        default:
-            return JS_EXCEPTION;
     }
+
+    return JS_UNDEFINED;
 }
 
 
@@ -58,7 +58,7 @@ JSValue CLASSSET_RL_Texture(JSContext *ctx, JSValueConst this_val, JSValue val, 
             break;
     }
 
-    return JS_EXCEPTION;
+    return JS_UNDEFINED;
 }
 
 JSValue CLASSCTOR_RL_Texture(JSContext *ctx, JSValueConst new_target, int argc, JSValueConst *argv) {
@@ -75,13 +75,17 @@ JSValue CLASSCTOR_RL_Texture(JSContext *ctx, JSValueConst new_target, int argc, 
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "path not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     if ( !(path = JS_ToCString(ctx, argv[0])) ) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "invalid path string"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     obj = Script_CreateOpaqueClass(ctx, new_target, CLASSID_RL_Texture, twrap);
@@ -105,7 +109,9 @@ JSValue CLASSFUNC_RL_Texture_DrawPro(JSContext *ctx, JSValueConst this_val, int 
     if (argc < 5) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "source, dest, origin, rotation, color not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     Rectangle source = RL_GetRectangle(ctx, argv[0]);
@@ -135,7 +141,9 @@ JSValue CLASSFUNC_RL_Texture_Draw(JSContext *ctx, JSValueConst this_val, int arg
     if (argc < 4) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "position, rotation, scale, color not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     Vector2 position = RL_GetVector2(ctx, argv[0]);

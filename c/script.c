@@ -109,14 +109,6 @@ void ScriptEngine_PrintValueRaw(ScriptEngine *engine, JSValue value) {
     fputc('\n', stderr);
 }
 
-void ScriptEngine_JSAPI_RevokeModule(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-
-    // JS_SetModuleExport
-    // JS_DetectModule(, )
-
-    // JS_SetModuleExport(ctx,)
-}
-
 ScriptEngine *ScriptEngine_Create(int argc, char **argv) {
     ScriptEngine *engine = malloc(sizeof(ScriptEngine));
 
@@ -144,7 +136,7 @@ ScriptEngine *ScriptEngine_Create(int argc, char **argv) {
     return engine;
 }
 
-bool ScriptEngine_HandleErrors(ScriptEngine *engine, JSValue result) {
+bool ScriptEngine_HandleErrors(ScriptEngine *engine, const char *path, JSValue result) {
     if (JS_HasException(engine->ctx)) {
         js_std_dump_error(engine->ctx);
         return false;
@@ -175,12 +167,12 @@ bool ScriptEngine_Eval(ScriptEngine *engine, JSValue *result, const char *filena
     if (length <= 0)
         length = strlen(code);
 
-    JSValue value = JS_Eval(engine->ctx, code, length, filename, flags);
+    JSValue value = JS_Eval(engine->ctx, code, length, filename, flags | JS_EVAL_FLAG_STRICT);
     if (result)
         *result = value;
 
 
-    success = ScriptEngine_HandleErrors(engine, value);
+    success = ScriptEngine_HandleErrors(engine, filename, value);
 
     if (!result)
         JS_FreeValue(engine->ctx, value);
@@ -190,7 +182,8 @@ bool ScriptEngine_Eval(ScriptEngine *engine, JSValue *result, const char *filena
 
 bool ScriptEngine_CallFunction(ScriptEngine *engine, JSValue function, int argc, JSValue *argv, JSValue *result) {
     JSValue value = JS_Call(engine->ctx, function, JS_UNDEFINED, argc, argv);
-    bool success  = ScriptEngine_HandleErrors(engine, value);
+
+    bool success  = ScriptEngine_HandleErrors(engine, "<anonymous>", value);
 
     if (result)
         *result = value;
@@ -205,8 +198,6 @@ JSValue ScriptEngine_GetGlobal(ScriptEngine *engine, const char *name) {
 }
 
 JSValue Script_CreateOpaqueClass(JSContext *ctx, JSValue class_obj, JSClassID class_id, void *data) {
-    /* using new_target to get the prototype is necessary when the
-     *    class is extended*. */
     JSValue prototype   = JS_GetPropertyStr(ctx, class_obj, "prototype");
     ScriptEngine engine = Script_GetEngineFromContext(ctx);
 

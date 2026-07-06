@@ -17,7 +17,9 @@ JSValue RL_LoadFileData_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, J
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "filename not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     filename = JS_ToCString(ctx, argv[0]);
@@ -38,7 +40,9 @@ JSValue RL_LoadFileText_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, J
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "filename not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     filename = JS_ToCString(ctx, argv[0]);
@@ -50,7 +54,9 @@ JSValue RL_LoadFileText_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, J
     if (!text) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "failed to load file"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
 
@@ -83,7 +89,9 @@ JSValue RL_InitWindow_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSV
     if (argc < 3) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "width, height, title not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     JS_ToInt32(ctx, &width,   argv[0]);
@@ -119,7 +127,9 @@ JSValue RL_SetConfigFlags_JSAPI(JSContext *ctx, JSValueConst this_val, int argc,
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "flags not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     JS_ToUint32(ctx, &flags, argv[0]);
@@ -158,7 +168,9 @@ JSValue RL_ClearBackground_JSAPI(JSContext *ctx, JSValueConst this_val, int argc
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "color not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
 
@@ -174,7 +186,9 @@ JSValue RL_DrawCircleSector_JSAPI(JSContext *ctx, JSValueConst this_val, int arg
     if (argc < 6) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "center, radius, start_angle, end_angle, segments not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     Vector2 center = RL_GetVector2(ctx, argv[0]);
@@ -200,7 +214,9 @@ JSValue RL_IsKeyDown_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSVa
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "key not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     JS_ToInt32(ctx, &key, argv[0]);
@@ -212,7 +228,9 @@ JSValue RL_IsKeyUp_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValu
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "key not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     JS_ToInt32(ctx, &key, argv[0]);

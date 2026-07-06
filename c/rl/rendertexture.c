@@ -42,9 +42,9 @@ JSValue CLASSGET_RL_RenderTexture(JSContext *ctx, JSValueConst this_val, int mag
             twrap->texture = render_texture->texture;
 
             return obj;
-        default:
-            return JS_EXCEPTION;
     }
+
+    return JS_UNDEFINED;
 }
 
 JSValue CLASSCTOR_RL_RenderTexture(JSContext *ctx, JSValueConst new_target, int argc, JSValueConst *argv) {
@@ -60,7 +60,9 @@ JSValue CLASSCTOR_RL_RenderTexture(JSContext *ctx, JSValueConst new_target, int 
     if (argc < 2) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "width, height not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     JS_ToInt32(ctx, &width,  argv[0]);

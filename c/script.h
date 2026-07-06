@@ -42,7 +42,7 @@ ScriptEngine Script_GetEngineFromContext(JSContext *ctx);
 void ScriptEngine_PrintValue(ScriptEngine *engine, JSValue value);
 void ScriptEngine_PrintValueRaw(ScriptEngine *engine, JSValue value);
 
-bool ScriptEngine_HandleErrors(ScriptEngine *engine, JSValue result);
+bool ScriptEngine_HandleErrors(ScriptEngine *engine, const char *path, JSValue result);
 
 bool ScriptEngine_CallFunction(ScriptEngine *engine, JSValue function, int argc, JSValue *argv, JSValue *result);
 JSValue Script_CreateOpaqueClass(JSContext *ctx, JSValue class_obj, JSClassID class_id, void *data);

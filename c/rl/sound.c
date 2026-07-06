@@ -24,13 +24,17 @@ JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JS
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "path not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     if ( !(path = JS_ToCString(ctx, argv[0])) ) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "invalid or null path string"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        return err;
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
     }
 
     obj = Script_CreateOpaqueClass(ctx, new_target, CLASSID_RL_Sound, image);
