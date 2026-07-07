@@ -337,7 +337,7 @@ JSValue RL_IsKeyUp_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValu
     return JS_NewBool(ctx, IsKeyUp(key));
 }
 
-JSValue RL_DrawFontEx_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+JSValue RL_DrawTextEx_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     Font *font;
     const char *text;
     double font_size, spacing;
@@ -400,7 +400,7 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
 
     ScriptEngine_RegisterFunc(engine, RL_IsKeyUp);
     ScriptEngine_RegisterFunc(engine, RL_IsKeyDown);
-    ScriptEngine_RegisterFunc(engine, RL_DrawFontEx);
+    ScriptEngine_RegisterFunc(engine, RL_DrawTextEx);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
 }
