@@ -112,12 +112,17 @@ globalThis.GetAsset = function(key) {
     return _asset_list[key];
 }
 
+
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values
 globalThis.getRandomInt = function(min, max) {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
 }
+
+globalThis.RAD2DEG = 180 / Math.PI;
+
+globalThis.MirrorRange = (value, x) => (value >= -x && value <= x);
 
 globalThis.GetVectorMagnitude = function(...values) {
     let sum = 0;
@@ -127,5 +132,49 @@ globalThis.GetVectorMagnitude = function(...values) {
 
     return Math.sqrt(sum);
 }
+
+class Vector2 {
+    x = 0;
+    y = 0;
+
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
+
+    addVector2(vec2) {
+        this.x += vec2.x;
+        this.y += vec2.y;
+    }
+
+    copy() {
+        return new Vector2(this.x, this.y);
+    }
+
+    mangitude() {
+        return GetVectorMagnitude(this.x, this.y);
+    }
+
+    normalize() {
+        const mangitude = this.mangitude();
+
+        this.x /= mangitude;
+        this.y /= mangitude;
+    }
+
+    circleClamp(radius) {
+        if (this.mangitude() > radius) {
+            this.normalize();
+            this.x *= radius;
+            this.y *= radius;
+        }
+    }
+
+    applyFunction(func) {
+        this.x = func(this.x, 'x');
+        this.y = func(this.y, 'y');
+    }
+}
+globalThis.Vector2 = Vector2;
 
 globalThis.Clamp = (value, min, max) => Math.min(Math.max(value, min), max);
