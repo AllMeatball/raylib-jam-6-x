@@ -4,6 +4,7 @@ import * as std from "std";
 import {
     RL_ConfigFlags,
     RL_DrawCircle,
+    RL_DrawTextureAtOrigin,
     RL_TextureWrap,
     RL_TextureFilter,
     RL_KeyboardKey
@@ -14,10 +15,7 @@ import { require } from "./modules/cjspoly.js";
 // import * as PHY from "./physics.js";
 console.log("ENGINE: <init.js> loaded");
 
-const args = scriptArgs.slice(1);
-
-for (let i = 0; i < args.length; i++)
-    console.log(args);
+globalThis.LAUNCH_ARGS = scriptArgs.slice(1);
 
 function handleErrno(result, message) {
     if (result[1] != 0)
@@ -52,6 +50,7 @@ delete globalThis.FS_Mount;
 
 globalThis.RL_ConfigFlags = RL_ConfigFlags;
 globalThis.RL_DrawCircle  = RL_DrawCircle;
+globalThis.RL_DrawTextureAtOrigin = RL_DrawTextureAtOrigin;
 
 globalThis.RL_TextureFilter = RL_TextureFilter;
 globalThis.RL_TextureWrap   = RL_TextureWrap;

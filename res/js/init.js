@@ -2,6 +2,15 @@ console.log("welcome. the game is now in scripting scope");
 const chroma = require("./modules/chroma.min.js");
 
 globalThis.timer = 0;
+globalThis.GLOBAL_FLAGS = [];
+
+for (let i = 0; i < LAUNCH_ARGS.length; i++) {
+    const arg = LAUNCH_ARGS[i];
+    if (arg.charAt(0) == '+') {
+        globalThis.GLOBAL_FLAGS.push(arg.slice(1));
+        continue;
+    }
+}
 
 function LoadWindowFlagsFromArray(flags) {
     let window_flags = 0;
@@ -60,17 +69,10 @@ function ENGINE_Update(dt) {
 function ENGINE_Draw() {
     RL_ClearBackground(BG_COLOR);
 
-
-    // PLAYER_TEXTURE.draw(player.pos, Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
-    // player.texture.draw(RL_GetMousePosition(), Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
-    // player.draw();
-
     player.draw();
     RL_DrawTextEx(MAIN_FONT, "abcdefghijk", {x: 0, y: 0}, 64, 0, [255,255,255]);
 
-    // canvas_tex.draw(pos, 0, 1, chroma('white').rgb());
-
-    RL_DrawFPS();
+    // RL_DrawFPS();
 }
 
 function ENGINE_Shutdown() {
