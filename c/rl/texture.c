@@ -155,3 +155,16 @@ JSValue CLASSFUNC_RL_Texture_Draw(JSContext *ctx, JSValueConst this_val, int arg
 
     return JS_UNDEFINED;
 }
+
+JSValue CLASSFUNC_RL_Texture_GenMipmaps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    double rotation = 0;
+    double scale = 0;
+
+    struct TextureWrap_JSAPI *twrap = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Texture);
+
+    if (!twrap)
+        return JS_EXCEPTION;
+
+    GenTextureMipmaps(&twrap->texture);
+    return JS_UNDEFINED;
+}

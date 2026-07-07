@@ -9,6 +9,7 @@ JSValue CLASSSET_RL_Texture(JSContext *ctx, JSValueConst this_val, JSValue val, 
 
 JSValue CLASSFUNC_RL_Texture_Draw(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 JSValue CLASSFUNC_RL_Texture_DrawPro(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
+JSValue CLASSFUNC_RL_Texture_GenMipmaps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 
 SCRIPTENGINE_DECLARE_CLASS(RL_Texture, CLASSFINAL_RL_Texture);
 extern JSValue CLASSOBJ_RL_Texture;
@@ -30,4 +31,5 @@ static const JSCFunctionListEntry CLASSFUNCS_RL_Texture[] = {
 
     JS_CFUNC_DEF("draw", 0,    CLASSFUNC_RL_Texture_Draw),
     JS_CFUNC_DEF("drawPro", 0, CLASSFUNC_RL_Texture_DrawPro),
+    JS_CFUNC_DEF("genMipmaps", 0, CLASSFUNC_RL_Texture_GenMipmaps),
 };
