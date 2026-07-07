@@ -16,9 +16,8 @@ console.log("ENGINE: <init.js> loaded");
 
 const args = scriptArgs.slice(1);
 
-for (let i = 0; i < args.length; i++) {
+for (let i = 0; i < args.length; i++)
     console.log(args);
-}
 
 function handleErrno(result, message) {
     if (result[1] != 0)
