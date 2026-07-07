@@ -310,6 +310,11 @@ JSValue RL_GetMousePosition_JSAPI(JSContext *ctx, JSValueConst this_val, int arg
     return RL_CreateVector2(ctx, vector);
 }
 
+JSValue RL_GetMouseDelta_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    Vector2 vector = GetMouseDelta();
+    return RL_CreateVector2(ctx, vector);
+}
+
 JSValue RL_IsKeyDown_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     int32_t key;
     if (argc < 1) {
@@ -393,7 +398,7 @@ JSValue RL_DrawRectangle_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, 
     return JS_UNDEFINED;
 }
 
-JSValue RL_SetCursorShown_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+JSValue RL_SetCursorEnabled_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     if (argc < 1) {
         JSValue err = JS_NewError(ctx);
         JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "state not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
@@ -403,9 +408,9 @@ JSValue RL_SetCursorShown_JSAPI(JSContext *ctx, JSValueConst this_val, int argc,
     }
 
     if (JS_ToBool(ctx, argv[0]))
-        ShowCursor();
+        EnableCursor();
     else
-        HideCursor();
+        DisableCursor();
 
     return JS_UNDEFINED;
 }
@@ -435,8 +440,10 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     ScriptEngine_RegisterFunc(engine, RL_ClearBackground);
     ScriptEngine_RegisterFunc(engine, RL_DrawCircleSector);
 
-    ScriptEngine_RegisterFunc(engine, RL_SetCursorShown);
+    ScriptEngine_RegisterFunc(engine, RL_SetCursorEnabled);
     ScriptEngine_RegisterFunc(engine, RL_GetMousePosition);
+    ScriptEngine_RegisterFunc(engine, RL_GetMouseDelta);
+
     ScriptEngine_RegisterFunc(engine, RL_IsKeyUp);
     ScriptEngine_RegisterFunc(engine, RL_IsKeyDown);
     ScriptEngine_RegisterFunc(engine, RL_DrawTextEx);
