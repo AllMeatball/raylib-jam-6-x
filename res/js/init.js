@@ -50,8 +50,8 @@ require('./assets.js');
 const Body = require("./body.js");
 const Player = require("./player.js");
 
-// const canvas = new RL_RenderTexture(64, 64);
-// const canvas_tex = canvas.texture;
+if (!GLOBAL_FLAGS.includes('show_mouse'))
+    RL_SetCursorEnabled(false);
 
 let player = new Player(0, 0);
 
