@@ -161,3 +161,22 @@ export function RL_DrawCircle(center, radius, color) {
     RL_DrawCircleSector(center, radius, 0, 360, 36, color);
 }
 
+export function RL_DrawTextureAtOrigin(texture, origin, position, rotation, scale, color) {
+    const src = {
+        x: 0,
+        y: 0,
+        width:  texture.width,
+        height: texture.height,
+    };
+
+    const dest = {
+        x: position.x,
+        y: position.y,
+        width:  texture.width  * scale.x,
+        height: texture.height * scale.y,
+    };
+
+
+    texture.drawPro(src, dest, origin, rotation, color);
+}
+

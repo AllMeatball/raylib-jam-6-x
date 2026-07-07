@@ -1,6 +1,13 @@
 class Player {
     pos = {x: 0, y: 0};
     dir = {x: 0, y: 0};
+    hitbox = {
+        x: 310,
+        y: 355,
+
+        width: 428,
+        height: 609,
+    };
 
     damping = 0.15;
 
@@ -22,6 +29,12 @@ class Player {
 
         this.pos.x = x;
         this.pos.y = y;
+
+        this.hitbox.x *= this.body.texture_scale;
+        this.hitbox.y *= this.body.texture_scale;
+        this.hitbox.width *= this.body.texture_scale;
+        this.hitbox.height *= this.body.texture_scale;
+
     }
 
     update(dt) {
@@ -30,22 +43,22 @@ class Player {
 
         let has_input = false;
 
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_LEFT)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_A)) {
             this.dir.x -= 1;
             has_input = true;
         }
 
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_RIGHT)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_D)) {
             this.dir.x += 1;
             has_input = true;
         }
 
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_UP)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_W)) {
             this.dir.y -= 1;
             has_input = true;
         }
 
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_DOWN)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_S)) {
             this.dir.y += 1;
             has_input = true;
         }
@@ -54,7 +67,7 @@ class Player {
         let moving_y = Math.abs(this.dir.y) > 0;
 
         if (moving_x || moving_y)
-            this.visual.anim_scale += dt * 4;
+            this.visual.anim_scale += dt * 8;
         else
             this.visual.anim_scale -= dt * 4;
 
@@ -85,12 +98,24 @@ class Player {
             y: (Math.abs(Math.cos(timer * 8.0)  * 4.0) - 4) * anim_scale,
         };
 
-        const angle = (Math.cos(timer * 6.0)) * anim_scale;
+        const angle = (Math.cos(timer * 9.0)) * anim_scale;
 
         // pos.x += this.pos.x;
         // pos.y += this.pos.y;
 
-        this.body.draw(this.pos, pos_offset, angle, [255,255,255]);
+        const scale = {
+            x: this.body.texture_scale,
+            y: this.body.texture_scale
+        };
+
+        const hitbox = {...this.hitbox};
+        hitbox.x += this.pos.x;
+        hitbox.y += this.pos.y;
+
+        this.body.draw(this.pos, pos_offset, angle, scale, [255,255,255]);
+        if (GLOBAL_FLAGS.includes("boxes")) {
+            RL_DrawRectangle(hitbox, chroma('red').alpha(0.5).rgba());
+        }
     }
 }
 
