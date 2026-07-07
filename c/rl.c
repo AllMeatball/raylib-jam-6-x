@@ -36,8 +36,9 @@ Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
     if (!JS_IsNumber(alpha)) {
         color.a = 255;
     } else {
-        JS_ToUint32(ctx, &val_u32, alpha);
-        color.a = val_u32;
+        double alpha_f64 = 0;
+        JS_ToFloat64(ctx, &alpha_f64, alpha);
+        color.a = alpha_f64 * 255;
     }
 
 
@@ -372,6 +373,26 @@ JSValue RL_DrawTextEx_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSV
     return JS_UNDEFINED;
 }
 
+JSValue RL_DrawRectangle_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    Rectangle rect;
+    Color color;
+
+    if (argc < 2) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "rect, color not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    rect  = RL_GetRectangle(ctx, argv[0]);
+    color = RL_GetColor(ctx, argv[1]);
+
+    DrawRectangleRec(rect, color);
+
+    return JS_UNDEFINED;
+}
+
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_RenderTexture);
@@ -396,11 +417,12 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     ScriptEngine_RegisterFunc(engine, RL_SetWindowIcons);
     ScriptEngine_RegisterFunc(engine, RL_ClearBackground);
     ScriptEngine_RegisterFunc(engine, RL_DrawCircleSector);
-    ScriptEngine_RegisterFunc(engine, RL_GetMousePosition);
 
+    ScriptEngine_RegisterFunc(engine, RL_GetMousePosition);
     ScriptEngine_RegisterFunc(engine, RL_IsKeyUp);
     ScriptEngine_RegisterFunc(engine, RL_IsKeyDown);
     ScriptEngine_RegisterFunc(engine, RL_DrawTextEx);
+    ScriptEngine_RegisterFunc(engine, RL_DrawRectangle);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
 }
