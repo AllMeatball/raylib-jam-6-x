@@ -169,6 +169,9 @@ export function RL_DrawTextureAtOrigin(texture, origin, position, rotation, scal
         height: texture.height,
     };
 
+    if (scale.y === undefined)
+        scale.y = scale.x;
+
     const dest = {
         x: position.x,
         y: position.y,

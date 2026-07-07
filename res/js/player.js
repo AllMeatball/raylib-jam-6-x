@@ -1,6 +1,80 @@
+class Wand {
+    pos = new Vector2();
+    cursor_pos = new Vector2();
+
+    angle = 0;
+    angle_offset = Math.PI/2;
+
+    radius = 96;
+    backdraw = false;
+
+    constructor(parent) {
+        this.parent = parent;
+        this.texture = GetAsset('texture.player_wand');
+    }
+
+    getAbsolutePos() {
+        const abs_pos = this.pos.copy();
+        const player_center = this.parent.body.getCenter();
+
+        abs_pos.x += this.parent.pos.x + player_center.x;
+        abs_pos.y += this.parent.pos.y + player_center.y;
+
+        return abs_pos;
+    }
+
+    update(dt) {
+        const mouse_delta = RL_GetMouseDelta();
+
+        mouse_delta.x *= 0.45;
+        mouse_delta.y *= 0.45;
+
+        this.pos.x += mouse_delta.x;
+        this.pos.y += mouse_delta.y;
+
+        this.pos.circleClamp(this.radius);
+
+        this.angle = (
+            Math.atan2(
+                this.pos.y,
+                this.pos.x
+            )
+        ) % (Math.PI*2);
+
+        const pos = this.getAbsolutePos();
+        const hitbox = this.parent.getHitbox();
+
+        // const wand_above_player = (this.pos.y) < (this.parent.hitbox.y + 48);
+        const wand_above_player = (pos.y) < (hitbox.y + 48);
+        this.backdraw = MirrorRange(this.angle, 0.85) || wand_above_player;
+    }
+
+    draw() {
+        const wand_center = {
+            x: (this.texture.width  * this.parent.body.texture_scale) * 0.5,
+            y: (this.texture.height * this.parent.body.texture_scale) * 0.5,
+        };
+
+        const pos = this.getAbsolutePos();
+        RL_DrawTextureAtOrigin(
+            this.texture,
+            wand_center,
+            pos,
+            (this.angle_offset + this.angle) * RAD2DEG,
+            {x: this.parent.body.texture_scale},
+            this.parent.color
+        );
+
+        const hitbox = this.parent.getHitbox();
+    }
+}
+
 class Player {
-    pos = {x: 0, y: 0};
-    dir = {x: 0, y: 0};
+    pos = new Vector2();
+    dir = new Vector2();
+
+    color = [255,255,255];
+
     hitbox = {
         x: 310,
         y: 355,
@@ -11,21 +85,20 @@ class Player {
 
     damping = 0.15;
 
-    velocity = {x: 0, y: 0};
+    velocity = new Vector2();
 
     visual = {
         anim_scale: 0,
     };
 
     speed = 48;
-    body = undefined
 
     constructor(x = 0, y = 0) {
-
         this.body = new Body(
             GetAsset('texture.player'),
             GetAsset('texture.shadow')
         );
+        this.wand = new Wand(this);
 
         this.pos.x = x;
         this.pos.y = y;
@@ -34,7 +107,14 @@ class Player {
         this.hitbox.y *= this.body.texture_scale;
         this.hitbox.width *= this.body.texture_scale;
         this.hitbox.height *= this.body.texture_scale;
+    }
 
+    getHitbox() {
+        const hitbox = {...this.hitbox};
+        hitbox.x += this.pos.x;
+        hitbox.y += this.pos.y;
+
+        return hitbox;
     }
 
     update(dt) {
@@ -77,17 +157,23 @@ class Player {
         if (moving_x && moving_y)
             speed_mult = 0.65;
 
-        this.velocity.x += this.dir.x * this.speed * speed_mult;
-        this.velocity.y += this.dir.y * this.speed * speed_mult;
+        this.velocity.addVector2({
+            x: this.dir.x * this.speed * speed_mult,
+            y: this.dir.y * this.speed * speed_mult,
+        });
 
+        this.velocity.addVector2({
+            x: this.velocity.x * dt,
+            y: this.velocity.y * dt,
+        });
 
         this.pos.x += this.velocity.x * dt;
         this.pos.y += this.velocity.y * dt;
 
-
         this.velocity.x *= (1 - this.damping);
         this.velocity.y *= (1 - this.damping);
 
+        this.wand.update(dt);
     }
 
     draw() {
@@ -103,19 +189,26 @@ class Player {
         // pos.x += this.pos.x;
         // pos.y += this.pos.y;
 
-        const scale = {
-            x: this.body.texture_scale,
-            y: this.body.texture_scale
-        };
 
-        const hitbox = {...this.hitbox};
-        hitbox.x += this.pos.x;
-        hitbox.y += this.pos.y;
+        if (this.wand.backdraw)
+            this.wand.draw();
 
-        this.body.draw(this.pos, pos_offset, angle, scale, [255,255,255]);
+        this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.color);
         if (GLOBAL_FLAGS.includes("boxes")) {
+            const center = this.body.getCenter();
+            const hitbox = this.getHitbox();
             RL_DrawRectangle(hitbox, chroma('red').alpha(0.5).rgba());
+
+            const player_origin = {
+                x: this.pos.x + center.x,
+                y: this.pos.y + center.y
+            };
+
+            RL_DrawCircle(player_origin, this.wand.radius, chroma('yellow').alpha(0.5).rgba());
         }
+
+        if (!this.wand.backdraw)
+            this.wand.draw();
     }
 }
 

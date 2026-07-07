@@ -8,7 +8,17 @@ class Body {
         this.shadow_texture = shadow_texture;
     }
 
+    getCenter() {
+        return {
+            x: (this.texture.width  * this.texture_scale) * 0.5,
+            y: (this.texture.height * this.texture_scale) * 0.5
+        };
+    }
+
     draw(pos, pos_offset, angle, scale, color) {
+        if (scale.y === undefined)
+            scale.y = scale.x;
+
         const src = {
             x: 0,
             y: 0,
@@ -36,20 +46,17 @@ class Body {
         this.shadow_texture.drawPro(src, dest, {x: 0, y: 0}, 0, [0,0,0, 0.20]);
         // console.log(pos_offset);
 
-        // pos.x += this.pos.x;
-        // pos.y += this.pos.y;
-        // this.texture.draw({x: pos_offset.x + pos.x, y: pos_offset.y + pos.y}, angle, this.texture_scale, color);
-        const center = {
-            x: (this.texture.width  * this.texture_scale) * 0.5,
-            y: (this.texture.height * this.texture_scale) * 0.5
-        };
+        scale.x *= this.texture_scale;
+        scale.y *= this.texture_scale;
+
+        const center = this.getCenter();
 
         RL_DrawTextureAtOrigin(
             this.texture,
             center,
             {
                 x: (pos_offset.x + center.x + pos.x),
-                y: (pos_offset.y + center.x + pos.y)
+                y: (pos_offset.y + center.y + pos.y)
             },
             angle,
             scale,
