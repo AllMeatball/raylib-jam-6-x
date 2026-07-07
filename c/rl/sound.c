@@ -12,13 +12,13 @@ void CLASSFINAL_RL_Sound(JSRuntime *rt, JSValue val) {
 }
 
 JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JSValueConst *argv) {
-    Image *image = NULL;
+    Sound *sound = NULL;
     JSValue obj = JS_UNDEFINED;
     const char *path = NULL;
 
-    image = js_mallocz(ctx, sizeof(Image));
+    sound = js_mallocz(ctx, sizeof(Sound));
 
-    if (!image)
+    if (!sound)
         return JS_EXCEPTION;
 
     if (argc < 1) {
@@ -37,12 +37,12 @@ JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JS
         return JS_EXCEPTION;
     }
 
-    obj = Script_CreateOpaqueClass(ctx, new_target, CLASSID_RL_Sound, image);
+    obj = Script_CreateOpaqueClass(ctx, new_target, CLASSID_RL_Sound, sound);
 
     if (JS_IsException(obj))
         return JS_EXCEPTION;
 
-    *image = LoadImage(path);
+    *sound = LoadSound(path);
 
     return obj;
 }

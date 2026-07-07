@@ -1,6 +1,8 @@
 console.log("welcome. the game is now in scripting scope");
 const chroma = require("./modules/chroma.min.js");
 
+globalThis.timer = 0;
+
 function LoadWindowFlagsFromArray(flags) {
     let window_flags = 0;
     for (const flag_name of flags) {
@@ -32,30 +34,39 @@ config.icons.forEach((path) => {
 
 RL_SetWindowIcons(...icons);
 
-const canvas = new RL_RenderTexture(64, 64);
-const canvas_tex = canvas.texture;
+let player_texture = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/wizzy.png", "texture.player");
+player_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
+player_texture.filter = RL_TextureFilter.TEXTURE_FILTER_TRILINEAR;
 
-let timer = 0;
+const Player = require("./player.js");
+
+// const canvas = new RL_RenderTexture(64, 64);
+// const canvas_tex = canvas.texture;
+
+let player = new Player(0, 0);
+
 function ENGINE_Update(dt) {
-    timer += dt;
-}
+    globalThis.timer += dt;
+    // console.log(player);
 
-const texture = new RL_Texture("gfx/wizzy.png");
-texture.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
+    // player.pos.x = mouse_xy.x;
+    // player.pos.y = mouse_xy.y;
+
+
+    player.update(dt);
+}
 
 function ENGINE_Draw() {
     RL_ClearBackground(chroma('coral').rgb());
 
-    if (RL_IsKeyDown(RL_KeyboardKey.KEY_LEFT)) {
-        console.log("left");
-    }
 
-    const pos = RL_GetMousePosition();
-    // pos.x += Math.cos(timer * 8.0) * 16;
-    pos.y += Math.sin(timer * 12.0) * 8;
+    // PLAYER_TEXTURE.draw(player.pos, Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
+    // player.texture.draw(RL_GetMousePosition(), Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
+    // player.draw();
+
+    player.draw();
 
     // canvas_tex.draw(pos, 0, 1, chroma('white').rgb());
-    texture.draw(pos, Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
 
     RL_DrawFPS();
 }

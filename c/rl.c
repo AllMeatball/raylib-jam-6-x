@@ -11,6 +11,106 @@
 #include "rl/texture.h"
 #include "rl/rendertexture.h"
 
+#include "rl/font.h"
+
+Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
+    Color color = {};
+
+    JSValue red   = JS_GetPropertyUint32(ctx, color_obj, 0);
+    JSValue green = JS_GetPropertyUint32(ctx, color_obj, 1);
+    JSValue blue  = JS_GetPropertyUint32(ctx, color_obj, 2);
+
+    JSValue alpha = JS_GetPropertyUint32(ctx, color_obj, 3);
+
+    uint32_t val_u32;
+    JS_ToUint32(ctx, &val_u32, red);
+    color.r = val_u32;
+
+    JS_ToUint32(ctx, &val_u32, green);
+    color.g = val_u32;
+
+    JS_ToUint32(ctx, &val_u32, blue);
+    color.b = val_u32;
+
+
+    if (!JS_IsNumber(alpha)) {
+        color.a = 255;
+    } else {
+        JS_ToUint32(ctx, &val_u32, alpha);
+        color.a = val_u32;
+    }
+
+
+    JS_FreeValue(ctx, red);
+    JS_FreeValue(ctx, blue);
+    JS_FreeValue(ctx, green);
+    JS_FreeValue(ctx, alpha);
+
+    return color;
+}
+
+
+// TODO: performance check using `JS_GetPropertyStr` with `JS_GetProperty` using atoms inplace of strings
+Vector2 RL_GetVector2(JSContext *ctx, JSValue vector_obj) {
+    Vector2 vector = {};
+
+    JSValue x = JS_GetPropertyStr(ctx, vector_obj, "x");
+    JSValue y = JS_GetPropertyStr(ctx, vector_obj, "y");
+
+
+    double val_f64;
+
+    JS_ToFloat64(ctx, &val_f64, x);
+    vector.x = val_f64;
+    JS_ToFloat64(ctx, &val_f64, y);
+    vector.y = val_f64;
+
+    JS_FreeValue(ctx, x);
+    JS_FreeValue(ctx, y);
+
+    return vector;
+}
+
+JSValue RL_CreateVector2(JSContext *ctx, Vector2 vector) {
+    JSValue vector_obj = JS_NewObject(ctx);
+
+    JS_SetPropertyStr(ctx, vector_obj, "x", JS_NewFloat64(ctx, vector.x));
+    JS_SetPropertyStr(ctx, vector_obj, "y", JS_NewFloat64(ctx, vector.y));
+
+    return vector_obj;
+}
+
+Rectangle RL_GetRectangle(JSContext *ctx, JSValue rect_obj) {
+    Rectangle rect = {};
+
+    JSValue x = JS_GetPropertyStr(ctx, rect_obj, "x");
+    JSValue y = JS_GetPropertyStr(ctx, rect_obj, "y");
+
+    JSValue width  = JS_GetPropertyStr(ctx, rect_obj, "width");
+    JSValue height = JS_GetPropertyStr(ctx, rect_obj, "height");
+
+
+    double val_f64;
+
+    JS_ToFloat64(ctx, &val_f64, x);
+    rect.x = val_f64;
+    JS_ToFloat64(ctx, &val_f64, y);
+    rect.y = val_f64;
+
+    JS_ToFloat64(ctx, &val_f64, width);
+    rect.width = val_f64;
+    JS_ToFloat64(ctx, &val_f64, height);
+    rect.height = val_f64;
+
+    JS_FreeValue(ctx, x);
+    JS_FreeValue(ctx, y);
+    JS_FreeValue(ctx, width);
+    JS_FreeValue(ctx, height);
+
+    return rect;
+}
+
+
 JSValue RL_LoadFileData_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     int length = 0;
     const char *filename = NULL;
@@ -237,12 +337,49 @@ JSValue RL_IsKeyUp_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValu
     return JS_NewBool(ctx, IsKeyUp(key));
 }
 
+JSValue RL_DrawFontEx_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    Font *font;
+    const char *text;
+    double font_size, spacing;
+
+    Vector2 position;
+    Color tint;
+
+    if (argc < 6) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "font, text, position, font_size, spacing, tint not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    font = JS_GetOpaque2(ctx, argv[0], CLASSID_RL_Font);
+    if (!font)
+        return JS_EXCEPTION;
+
+    text = JS_ToCString(ctx, argv[1]);
+    position = RL_GetVector2(ctx, argv[2]);
+
+    JS_ToFloat64(ctx, &font_size, argv[3]);
+    JS_ToFloat64(ctx, &spacing, argv[4]);
+
+    tint = RL_GetColor(ctx, argv[5]);
+
+    DrawTextEx(*font, text, position, font_size, spacing, tint);
+
+    JS_FreeCString(ctx, text);
+
+    return JS_UNDEFINED;
+}
+
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
+    SCRIPTENGINE_DEFINE_CLASS2(engine, RL_RenderTexture);
 
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Image);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
-    SCRIPTENGINE_DEFINE_CLASS2(engine, RL_RenderTexture);
+
+    SCRIPTENGINE_DEFINE_CLASS(engine, RL_Font, NULL, 0);
 }
 
 void RL_LoadScriptingFunctions(ScriptEngine *engine) {
@@ -263,6 +400,7 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
 
     ScriptEngine_RegisterFunc(engine, RL_IsKeyUp);
     ScriptEngine_RegisterFunc(engine, RL_IsKeyDown);
+    ScriptEngine_RegisterFunc(engine, RL_DrawFontEx);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
 }

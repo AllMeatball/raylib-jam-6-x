@@ -22,6 +22,7 @@ set(APP_SRC
     fs.c
 
     rl.c
+    rl/font.c
     rl/image.c
     rl/sound.c
     rl/texture.c

@@ -19,22 +19,21 @@ void CLASSFINAL_RL_Texture(JSRuntime *rt, JSValue val) {
 
 JSValue CLASSGET_RL_Texture(JSContext *ctx, JSValueConst this_val, int magic)
 {
-    Texture *texture = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Texture);
-    if (!texture)
+    struct TextureWrap_JSAPI *twrap = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Texture);
+    if (!twrap)
         return JS_EXCEPTION;
 
-    int size = 0;
     switch (magic) {
         case 0:
-            return JS_NewInt32(ctx, texture->width);
+            return JS_NewInt32(ctx,  twrap->texture.width);
         case 1:
-            return JS_NewInt32(ctx, texture->height);
+            return JS_NewInt32(ctx,  twrap->texture.height);
         case 2:
-            return JS_NewInt32(ctx, texture->format);
+            return JS_NewInt32(ctx,  twrap->texture.format);
         case 3:
-            return JS_NewUint32(ctx, texture->id);
+            return JS_NewUint32(ctx, twrap->texture.id);
         case 4:
-            return JS_NewInt32(ctx, texture->mipmaps);
+            return JS_NewInt32(ctx,  twrap->texture.mipmaps);
     }
 
     return JS_UNDEFINED;
@@ -42,19 +41,19 @@ JSValue CLASSGET_RL_Texture(JSContext *ctx, JSValueConst this_val, int magic)
 
 
 JSValue CLASSSET_RL_Texture(JSContext *ctx, JSValueConst this_val, JSValue val, int magic) {
-    Texture *texture = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Texture);
-    if (!texture)
+    struct TextureWrap_JSAPI *twrap = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Texture);
+    if (!twrap)
         return JS_EXCEPTION;
 
     int32_t value = 0;
     switch (magic) {
         case 5:
             JS_ToInt32(ctx, &value, val);
-            SetTextureWrap(*texture, value);
+            SetTextureWrap(twrap->texture, value);
             break;
         case 6:
             JS_ToInt32(ctx, &value, val);
-            SetTextureFilter(*texture, value);
+            SetTextureFilter(twrap->texture, value);
             break;
     }
 

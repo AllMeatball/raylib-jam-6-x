@@ -86,16 +86,32 @@ globalThis.ASSET_TYPE = Object.freeze({
 });
 
 globalThis.require = require;
-globalThis.LoadAsset = function(type, path) {
+
+const _asset_list = {};
+globalThis.LoadAsset = function(type, path, key) {
+    let asset = undefined;
+
     switch (type) {
         case ASSET_TYPE.IMAGE:
-            return new RL_Image(path);
+            asset = new RL_Image(path);
+            break;
         case ASSET_TYPE.TEXTURE:
-            return new RL_Texture(path);
-        default:
-            throw Error(`Unknown asset type number ${type}`);
+            asset = new RL_Texture(path);
+            break;
     }
 
+    if (!asset)
+        throw Error(`Unknown asset type number ${type}`);
+
+    if (key in _asset_list)
+        throw Error(`Can't override asset key '${key}'`);
+
+    _asset_list[key] = asset;
+    return asset;
+}
+
+globalThis.GetAsset = function(key) {
+    return _asset_list[key];
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values
@@ -104,3 +120,14 @@ globalThis.getRandomInt = function(min, max) {
     const maxFloored = Math.floor(max);
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
 }
+
+globalThis.GetVectorMagnitude = function(...values) {
+    let sum = 0;
+
+    for (const value of values)
+        sum += value * value;
+
+    return Math.sqrt(sum);
+}
+
+globalThis.Clamp = (value, min, max) => Math.min(Math.max(value, min), max);
