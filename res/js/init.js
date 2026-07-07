@@ -34,10 +34,11 @@ config.icons.forEach((path) => {
 
 RL_SetWindowIcons(...icons);
 
-let player_texture = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/wizzy.png", "texture.player");
-player_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
-player_texture.filter = RL_TextureFilter.TEXTURE_FILTER_TRILINEAR;
+const BG_COLOR = chroma(0x187a3e).rgb();
+const MAIN_FONT = new RL_Font('fonts/GochiHand-Regular.ttf', 64);
+require('./assets.js');
 
+const Body = require("./body.js");
 const Player = require("./player.js");
 
 // const canvas = new RL_RenderTexture(64, 64);
@@ -57,7 +58,7 @@ function ENGINE_Update(dt) {
 }
 
 function ENGINE_Draw() {
-    RL_ClearBackground(chroma('coral').rgb());
+    RL_ClearBackground(BG_COLOR);
 
 
     // PLAYER_TEXTURE.draw(player.pos, Math.cos(timer * 8.0) - Math.sin(timer * 7.85), 0.15, chroma('white').rgb());
@@ -65,6 +66,7 @@ function ENGINE_Draw() {
     // player.draw();
 
     player.draw();
+    RL_DrawTextEx(MAIN_FONT, "abcdefghijk", {x: 0, y: 0}, 64, 0, [255,255,255]);
 
     // canvas_tex.draw(pos, 0, 1, chroma('white').rgb());
 

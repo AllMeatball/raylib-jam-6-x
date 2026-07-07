@@ -10,11 +10,15 @@ class Player {
         anim_scale: 0,
     };
 
-    speed = 64;
-    texture = undefined;
+    speed = 48;
+    body = undefined
 
     constructor(x = 0, y = 0) {
-        this.texture = GetAsset('texture.player');
+
+        this.body = new Body(
+            GetAsset('texture.player'),
+            GetAsset('texture.shadow')
+        );
 
         this.pos.x = x;
         this.pos.y = y;
@@ -76,34 +80,17 @@ class Player {
     draw() {
         const anim_scale = this.visual.anim_scale;
         const timer = globalThis.timer;
-        const pos = {
+        const pos_offset = {
             x: 0,
-            y: (Math.sin(timer * 12.0) * 4) * anim_scale,
+            y: (Math.abs(Math.cos(timer * 8.0)  * 4.0) - 4) * anim_scale,
         };
 
-        let angle = (Math.cos(timer * 8.0) - Math.sin(timer * 10.0)) * anim_scale;
+        const angle = (Math.cos(timer * 6.0)) * anim_scale;
 
-        pos.x += this.pos.x;
-        pos.y += this.pos.y;
+        // pos.x += this.pos.x;
+        // pos.y += this.pos.y;
 
-
-        const src = {
-            x: 0,
-            y: 0,
-            width:  this.texture.width,
-            height: this.texture.height,
-        };
-
-        const dest = {
-            x: 0,
-            y: 0,
-            width:  this.texture.width  * 0.5,
-            height: this.texture.height * 0.5,
-        };
-
-
-        this.texture.drawPro(src, dest, {x: 0, y: 0}, angle, 0.15, [255,255,255,50]);
-        // this.texture.draw(pos, angle, 0.15, [255,255,255]);
+        this.body.draw(this.pos, pos_offset, angle, [255,255,255]);
     }
 }
 
