@@ -88,6 +88,7 @@ class Player {
     velocity = new Vector2();
 
     visual = {
+        timer: 0,
         anim_scale: 0,
     };
 
@@ -121,27 +122,14 @@ class Player {
         this.dir.x = 0;
         this.dir.y = 0;
 
-        let has_input = false;
-
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_A)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_A))
             this.dir.x -= 1;
-            has_input = true;
-        }
-
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_D)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_D))
             this.dir.x += 1;
-            has_input = true;
-        }
-
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_W)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_W))
             this.dir.y -= 1;
-            has_input = true;
-        }
-
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_S)) {
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_S))
             this.dir.y += 1;
-            has_input = true;
-        }
 
         let moving_x = Math.abs(this.dir.x) > 0;
         let moving_y = Math.abs(this.dir.y) > 0;
@@ -152,6 +140,7 @@ class Player {
             this.visual.anim_scale -= dt * 4;
 
         this.visual.anim_scale = Clamp(this.visual.anim_scale, 0.0, 1.0);
+        this.visual.timer += dt * this.visual.anim_scale;
 
         let speed_mult = 1;
         if (moving_x && moving_y)
@@ -173,18 +162,22 @@ class Player {
         this.velocity.x *= (1 - this.damping);
         this.velocity.y *= (1 - this.damping);
 
+        if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
+            const wand_pos = this.wand.getAbsolutePos();
+            globalThis.ENTITIES.push(new Dot(wand_pos.x, wand_pos.y));
+        }
+
         this.wand.update(dt);
     }
 
     draw() {
-        const anim_scale = this.visual.anim_scale;
-        const timer = globalThis.timer;
+        // const anim_scale = this.visual.anim_scale;
         const pos_offset = {
             x: 0,
-            y: (Math.abs(Math.cos(timer * 8.0)  * 4.0) - 4) * anim_scale,
+            y: (Math.abs(Math.cos(this.visual.timer * 8.0)  * 4.0) - 4) * this.visual.anim_scale,
         };
 
-        const angle = (Math.cos(timer * 9.0)) * anim_scale;
+        const angle = (Math.cos(this.visual.timer * 9.0)) * this.visual.anim_scale;
 
         // pos.x += this.pos.x;
         // pos.y += this.pos.y;

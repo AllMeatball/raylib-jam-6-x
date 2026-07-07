@@ -1,8 +1,9 @@
 console.log("welcome. the game is now in scripting scope");
 const chroma = require("./modules/chroma.min.js");
 
-globalThis.timer = 0;
+globalThis.TIMER = 0;
 globalThis.GLOBAL_FLAGS = [];
+globalThis.ENTITIES = [];
 
 for (let i = 0; i < LAUNCH_ARGS.length; i++) {
     const arg = LAUNCH_ARGS[i];
@@ -40,7 +41,7 @@ config.icons.forEach((path) => {
     const icon = new RL_Image(path);
     icons.push(icon);
 });
-
+// RL_IsMouseButtonPressed
 RL_SetWindowIcons(...icons);
 
 const BG_COLOR = chroma(0x187a3e).rgb();
@@ -48,28 +49,28 @@ const MAIN_FONT = new RL_Font('fonts/GochiHand-Regular.ttf', 64);
 require('./assets.js');
 
 const Body = require("./body.js");
-const Player = require("./player.js");
+const Dot = require("./entities/dot.js");
+const Player = require("./entities/player.js");
 
 if (!GLOBAL_FLAGS.includes('show_mouse'))
     RL_SetCursorEnabled(false);
 
-let player = new Player(0, 0);
+let PLAYER_ENTITY = new Player(0, 0);
+ENTITIES.push(PLAYER_ENTITY);
 
 function ENGINE_Update(dt) {
-    globalThis.timer += dt;
-    // console.log(player);
+    globalThis.TIMER += dt;
 
-    // player.pos.x = mouse_xy.x;
-    // player.pos.y = mouse_xy.y;
-
-
-    player.update(dt);
+    for (let ent of ENTITIES)
+        ent.update(dt);
 }
 
 function ENGINE_Draw() {
     RL_ClearBackground(BG_COLOR);
 
-    player.draw();
+    for (let ent of ENTITIES)
+        ent.draw();
+
     RL_DrawTextEx(MAIN_FONT, "abcdefghijk", {x: 0, y: 0}, 64, 0, [255,255,255]);
 
     // RL_DrawFPS();
