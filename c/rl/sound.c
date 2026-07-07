@@ -56,6 +56,26 @@ JSValue CLASSFUNC_RL_Sound_Play(JSContext *ctx, JSValueConst this_val, int argc,
     return JS_UNDEFINED;
 }
 
+JSValue CLASSFUNC_RL_Sound_SetPitch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    double pitch = 0;
+    Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    if (!sound)
+        return JS_EXCEPTION;
+
+    if (argc < 1) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "pitch not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    JS_ToFloat64(ctx, &pitch, argv[0]);
+    SetSoundPitch(*sound, pitch);
+    return JS_UNDEFINED;
+}
+
+
 JSValue CLASSFUNC_RL_Sound_Stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
     if (!sound)
