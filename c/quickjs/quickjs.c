@@ -1169,6 +1169,8 @@ static __exception int JS_ToArrayLengthFree(JSContext *ctx, uint32_t *plen,
                                             JSValue val, BOOL is_array_ctor);
 static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
                              JSValueConst val, int flags, int scope_idx);
+static JSValue JS_EvalObjectNamed(JSContext *ctx, JSValueConst this_obj,
+                                  JSValueConst val, const char *name, int flags, int scope_idx);
 JSValue __attribute__((format(printf, 2, 3))) JS_ThrowInternalError(JSContext *ctx, const char *fmt, ...);
 static __maybe_unused void JS_DumpAtoms(JSRuntime *rt);
 static __maybe_unused void JS_DumpString(JSRuntime *rt, const JSString *p);
@@ -37206,8 +37208,8 @@ static JSValue JS_EvalInternal(JSContext *ctx, JSValueConst this_obj,
     return ret;
 }
 
-static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
-                             JSValueConst val, int flags, int scope_idx)
+static JSValue JS_EvalObjectNamed(JSContext *ctx, JSValueConst this_obj,
+                             JSValueConst val, const char *name, int flags, int scope_idx)
 {
     JSValue ret;
     const char *str;
@@ -37218,9 +37220,15 @@ static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
     str = JS_ToCStringLen(ctx, &len, val);
     if (!str)
         return JS_EXCEPTION;
-    ret = JS_EvalInternal(ctx, this_obj, str, len, "<input>", flags, scope_idx);
+    ret = JS_EvalInternal(ctx, this_obj, str, len, name, flags, scope_idx);
     JS_FreeCString(ctx, str);
     return ret;
+}
+
+static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
+                             JSValueConst val, int flags, int scope_idx)
+{
+    JS_EvalObjectNamed(ctx, this_obj, val, "<input>", flags, scope_idx);
 }
 
 JSValue JS_EvalThis(JSContext *ctx, JSValueConst this_obj,
@@ -40956,7 +40964,8 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
     }
     string_buffer_puts8(b, " anonymous(");
 
-    n = argc - 1;
+    n = argc - 2;
+
     for(i = 0; i < n; i++) {
         if (i != 0) {
             string_buffer_putc8(b, ',');
@@ -40974,7 +40983,10 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
     if (JS_IsException(s))
         goto fail1;
 
-    obj = JS_EvalObject(ctx, ctx->global_obj, s, JS_EVAL_TYPE_INDIRECT, -1);
+    const char *name = JS_ToCString(ctx, argv[n + 1]);
+    obj = JS_EvalObjectNamed(ctx, ctx->global_obj, s, name, JS_EVAL_TYPE_INDIRECT, -1);
+
+    JS_FreeCString(ctx, name);
     JS_FreeValue(ctx, s);
     if (JS_IsException(obj))
         goto fail1;
