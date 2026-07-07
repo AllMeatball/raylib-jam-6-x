@@ -7,7 +7,8 @@ import {
     RL_DrawTextureAtOrigin,
     RL_TextureWrap,
     RL_TextureFilter,
-    RL_KeyboardKey
+    RL_KeyboardKey,
+    RL_MouseButton
 } from "./raylib.js";
 
 import { require } from "./modules/cjspoly.js";
@@ -55,6 +56,7 @@ globalThis.RL_DrawTextureAtOrigin = RL_DrawTextureAtOrigin;
 globalThis.RL_TextureFilter = RL_TextureFilter;
 globalThis.RL_TextureWrap   = RL_TextureWrap;
 globalThis.RL_KeyboardKey   = RL_KeyboardKey;
+globalThis.RL_MouseButton   = RL_MouseButton;
 
 globalThis.FS_AbsolutePath = function(path) {
     const path_parts = path.split('/');
