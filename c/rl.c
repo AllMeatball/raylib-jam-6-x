@@ -394,6 +394,38 @@ JSValue RL_DrawTextEx_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSV
     return JS_UNDEFINED;
 }
 
+
+JSValue RL_MeasureTextEx_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    Font *font;
+    const char *text;
+    double font_size, spacing;
+
+    Vector2 text_size;
+
+    if (argc < 4) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "font, text, font_size, spacing not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    font = JS_GetOpaque2(ctx, argv[0], CLASSID_RL_Font);
+    if (!font)
+        return JS_EXCEPTION;
+
+    text = JS_ToCString(ctx, argv[1]);
+
+    JS_ToFloat64(ctx, &font_size, argv[2]);
+    JS_ToFloat64(ctx, &spacing, argv[3]);
+
+    JSValue obj = RL_CreateVector2(ctx, MeasureTextEx(*font, text, font_size, spacing));
+
+    JS_FreeCString(ctx, text);
+
+    return obj;
+}
+
 JSValue RL_DrawRectangle_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     Rectangle rect;
     Color color;
@@ -465,6 +497,9 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     ScriptEngine_RegisterFunc(engine, RL_IsKeyUp);
     ScriptEngine_RegisterFunc(engine, RL_IsKeyDown);
     ScriptEngine_RegisterFunc(engine, RL_DrawTextEx);
+    ScriptEngine_RegisterFunc(engine, RL_MeasureTextEx);
+
+
     ScriptEngine_RegisterFunc(engine, RL_DrawRectangle);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
