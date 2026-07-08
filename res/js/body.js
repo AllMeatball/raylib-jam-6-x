@@ -20,10 +20,6 @@ class Body {
     }
 
     getCenter() {
-        console.log({
-            x: (this.rect.width  * this.scale) * 0.5,
-            y: (this.rect.height * this.scale) * 0.5
-        });
         return {
             x: (this.rect.width  * this.scale) * 0.5,
             y: (this.rect.height * this.scale) * 0.5
@@ -52,15 +48,6 @@ class Body {
             angle,
             color
         );
-
-        // RL_DrawTextureAtOrigin(
-        //     this.texture,
-        //     center,
-        //    ,
-        //     angle,
-        //     scale,
-        //     color
-        // );
     }
 
     draw(pos, pos_offset, angle, scale, color) {

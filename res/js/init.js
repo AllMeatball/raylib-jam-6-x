@@ -53,7 +53,9 @@ const TITLE_FONT = new RL_Font('fonts/PatrickHand-Regular.ttf', 256);
 require('./assets.js');
 
 const Body = require("./body.js");
+const Humanoid = require("./entities/humanoid.js");
 const PatternSystem = require("./patterns.js");
+
 
 const ENT_CLASS = {
     Projectile: require("./entities/projectile.js"),

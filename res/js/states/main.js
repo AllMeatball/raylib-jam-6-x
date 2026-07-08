@@ -5,7 +5,7 @@ const MainState = {
         ENTITIES.length = 0;
 
         this.level = 1;
-        this.PLAYER = new ENT_CLASS.Player(0, 0);
+        this.PLAYER = new ENT_CLASS.Player({x: 0, y: 0});
         ENTITIES.push(this.PLAYER);
 
         this.song = GetAsset('music.wizardtower');
