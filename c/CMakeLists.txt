@@ -26,6 +26,7 @@ set(APP_SRC
     rl/image.c
     rl/sound.c
     rl/texture.c
+    rl/musicstream.c
     rl/rendertexture.c
 )
 

@@ -3,7 +3,7 @@ player_texture.genMipmaps();
 player_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
 player_texture.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
 
-const player_wand = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/wand.png", "texture.player_wand");
+const player_wand = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/wand.png", "texture.player.wand");
 player_wand.genMipmaps();
 player_wand.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
 player_wand.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
@@ -17,3 +17,5 @@ const projectile = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/projectile.png", "texture.
 projectile.genMipmaps();
 projectile.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
 projectile.filter = RL_TextureFilter.TEXTURE_FILTER_POINT;
+
+LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-tower.ogg", "music.wizardtower");

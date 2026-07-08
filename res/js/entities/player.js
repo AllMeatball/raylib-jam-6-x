@@ -13,6 +13,7 @@ class Wand {
     constructor(parent) {
         this.parent = parent;
         this.texture = GetAsset('texture.player_wand');
+        this.texture = GetAsset('texture.player.wand');
     }
 
     getAbsolutePos() {

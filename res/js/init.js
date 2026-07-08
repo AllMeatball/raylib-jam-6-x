@@ -70,8 +70,9 @@ if (!GLOBAL_FLAGS.includes('show_mouse'))
 
 STATES.current.enter();
 function ENGINE_Update(dt) {
-    globalThis.TIMER += dt;
+    MusicUpdate();
 
+    globalThis.TIMER += dt;
     STATES.current.update(dt);
 }
 

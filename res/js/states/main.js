@@ -7,6 +7,10 @@ const MainState = {
         this.level = 1;
         this.PLAYER = new ENT_CLASS.Player(0, 0);
         ENTITIES.push(this.PLAYER);
+
+        this.song = GetAsset('music.wizardtower');
+        this.song.setPitch(0.85);
+        this.song.play();
     },
 
     update(dt) {

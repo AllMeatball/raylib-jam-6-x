@@ -7,9 +7,11 @@
 
 // CLASS BINDINGS
 #include "rl/image.h"
-#include "rl/sound.h"
 #include "rl/texture.h"
 #include "rl/rendertexture.h"
+
+#include "rl/sound.h"
+#include "rl/musicstream.h"
 
 #include "rl/font.h"
 
@@ -435,6 +437,7 @@ void RL_LoadScriptingClasses(ScriptEngine *engine) {
 
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Image);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
+    SCRIPTENGINE_DEFINE_CLASS2(engine, RL_MusicStream);
 
     SCRIPTENGINE_DEFINE_CLASS(engine, RL_Font, NULL, 0);
 }

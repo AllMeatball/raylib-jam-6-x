@@ -41,8 +41,8 @@ filenames.forEach((filename) => {
     file.close();
 
     mounts.forEach((mount) => {
-        // const archive_path = handleErrno(os.realpath(mount.archive));
-        FS_Mount(mount.archive, mount.mount, mount.append);
+        const archive_path = handleErrno(os.realpath(mount.archive));
+        FS_Mount(archive_path, mount.mount, mount.append);
     });
 });
 
@@ -83,6 +83,7 @@ globalThis.FS_AbsolutePath = function(path) {
 globalThis.ASSET_TYPE = Object.freeze({
     IMAGE: 0,
     TEXTURE: 1,
+    MUSIC: 2,
 });
 
 globalThis.require = require;
@@ -98,6 +99,9 @@ globalThis.LoadAsset = function(type, path, key) {
         case ASSET_TYPE.TEXTURE:
             asset = new RL_Texture(path);
             break;
+        case ASSET_TYPE.MUSIC:
+            asset = new RL_MusicStream(path);
+            break;
     }
 
     if (!asset)
@@ -112,6 +116,17 @@ globalThis.LoadAsset = function(type, path, key) {
 
 globalThis.GetAsset = function(key) {
     return _asset_list[key];
+}
+
+globalThis.MusicUpdate = function() {
+    for (const key in _asset_list) {
+        const asset = _asset_list[key];
+
+        if ( !(asset instanceof RL_MusicStream) )
+            continue;
+
+        asset.update();
+    }
 }
 
 

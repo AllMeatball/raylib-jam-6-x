@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     SetLoadFileTextCallback(FS_LoadTextData);
 
     // change dir to res to be able to handle music streaming
-    // ChangeDirectory("res");
+    ChangeDirectory("res");
 
     InitAudioDevice();
     script_data = LoadFileText("js/init.js");
