@@ -19,3 +19,4 @@ projectile.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
 projectile.filter = RL_TextureFilter.TEXTURE_FILTER_POINT;
 
 LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-tower.ogg", "music.wizardtower");
+// LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-title.ogg", "music.title");

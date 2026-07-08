@@ -11,6 +11,8 @@ const MainState = {
         this.song = GetAsset('music.wizardtower');
         this.song.setPitch(0.85);
         this.song.play();
+
+        RL_SetCursorEnabled(false);
     },
 
     update(dt) {

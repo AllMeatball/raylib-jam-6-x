@@ -1,5 +1,6 @@
 console.log("welcome. the game is now in scripting scope");
 const chroma = require("./modules/chroma.min.js");
+// const astar = require("./modules/astar.js");
 
 globalThis.TIMER = 0;
 globalThis.GLOBAL_FLAGS = [];
@@ -47,6 +48,8 @@ RL_SetWindowIcons(...icons);
 
 const BG_COLOR = chroma(0x187a3e).rgb();
 const MAIN_FONT = new RL_Font('fonts/GochiHand-Regular.ttf', 64);
+const TITLE_FONT = new RL_Font('fonts/PatrickHand-Regular.ttf', 256);
+
 require('./assets.js');
 
 const Body = require("./body.js");
@@ -64,9 +67,6 @@ let STATES = {
 };
 
 STATES.current = STATES.TITLE;
-
-if (!GLOBAL_FLAGS.includes('show_mouse'))
-    RL_SetCursorEnabled(false);
 
 STATES.current.enter();
 function ENGINE_Update(dt) {
