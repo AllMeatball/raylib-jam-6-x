@@ -1,0 +1,13 @@
+{
+  "synth_type": "Footsteppr",
+  "version": "1.0.0",
+  "file_name": "Random10",
+  "params": {
+    "masterVolume": 0.5,
+    "terrain": 3,
+    "heel": 0.5508099400033603,
+    "roll": 0.00004576314638582435,
+    "ball": 0.021661928639745143,
+    "swiftness": 0.06526159712775925
+  }
+}
