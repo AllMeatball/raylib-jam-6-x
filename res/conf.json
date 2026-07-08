@@ -1,9 +1,9 @@
 {
-    "title":   "Hexes",
+    "title":   "Hexzard",
     "width":   720,
     "height":  720,
 
     "max_fps": 60,
     "preflags":   [ "FLAG_MSAA_4X_HINT" ],
-    "icons": [ "gfx/wizzy.png" ]
+    "icons": [ "gfx/icon.png" ]
 }
