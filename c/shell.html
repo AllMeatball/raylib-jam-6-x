@@ -92,6 +92,21 @@
                     return canvas;
                 })()
             };
+
+            const search_string = window.location.search;
+            const params = new URLSearchParams(search_string);
+
+            if (params.has('globalflags')) {
+                const flags = params.get('globalflags').split(',');
+                for (const flag of flags)
+                    Module.arguments.push(`+${flag}`);
+            }
+
+            if (params.has('argv')) {
+                const args = params.get('argv').split(',');
+                Module.arguments.push( ...args );
+            }
+
         </script>
         {{{ SCRIPT }}}
     </body>

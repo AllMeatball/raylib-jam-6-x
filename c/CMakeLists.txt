@@ -40,7 +40,7 @@ if (EMSCRIPTEN)
     # ${CMAKE_SOURCE_DIR}/../res
 
     set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} -g")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1 -v --shell-file \"${CMAKE_SOURCE_DIR}/shell.html\" -O2")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1 -v --shell-file \"${CMAKE_SOURCE_DIR}/shell.html\" -sINITIAL_MEMORY=268435456 -O2")
     set(CMAKE_EXECUTABLE_SUFFIX ".html") # This line is used to set your executable to build with the emscripten html template so that you can directly open it.
     web_embed_file("mounts")
     web_embed_file("res")
