@@ -12,7 +12,8 @@ class Wand {
 
     constructor(parent) {
         this.parent = parent;
-        this.texture = GetAsset('texture.player_wand');
+        this.pattern_sys = new PatternSystem(this);
+
         this.texture = GetAsset('texture.player.wand');
     }
 
@@ -52,6 +53,14 @@ class Wand {
         this.backdraw = MirrorRange(this.angle, 0.85) || wand_above_player;
     }
 
+    cast() {
+        SFX_MAGIK.play();
+        SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
+
+        const pos = this.getAbsolutePos();
+        globalThis.ENTITIES.push(new ENT_CLASS.Projectile(this.parent, pos.x, pos.y, this.angle, 512));
+    }
+
     draw() {
         const wand_center = {
             x: (this.texture.width  * this.parent.body.texture_scale) * 0.5,
@@ -68,7 +77,7 @@ class Wand {
             this.parent.color
         );
 
-        const hitbox = this.parent.getHitbox();
+        // const hitbox = this.parent.getHitbox();
     }
 }
 
@@ -89,9 +98,7 @@ class Player {
     damping = 0.15;
 
     velocity = new Vector2();
-
     wand = new Wand(this);
-    pattern_sys = new PatternSystem(this);
 
     visual = {
         timer: 0,
@@ -177,10 +184,8 @@ class Player {
         this.velocity.y *= (1 - this.damping);
 
         if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
-            SFX_MAGIK.play();
-            SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
-            const wand_pos = this.wand.getAbsolutePos();
-            globalThis.ENTITIES.push(new ENT_CLASS.Projectile(this, wand_pos.x, wand_pos.y, this.wand.angle, 512));
+            RL_SetCursorEnabled(false);
+            this.wand.cast();
         }
 
         this.wand.update(dt);
