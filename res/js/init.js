@@ -4,7 +4,9 @@ const chroma = require("./modules/chroma.min.js");
 globalThis.TIMER = 0;
 globalThis.GLOBAL_FLAGS = [];
 globalThis.ENTITIES = [];
+globalThis.CollisionSystem = require('./collsionsys.js');
 
+globalThis.SCREEN_SIZE = 720;
 for (let i = 0; i < LAUNCH_ARGS.length; i++) {
     const arg = LAUNCH_ARGS[i];
     if (arg.charAt(0) == '+') {
@@ -18,7 +20,7 @@ function LoadWindowFlagsFromArray(flags) {
     for (const flag_name of flags) {
         const flag_mask = RL_ConfigFlags[flag_name];
 
-        if (flag_mask == undefined)
+        if (flag_mask === undefined)
             throw Error(`Invalid window flag '${flag_name}'`);
 
         window_flags |= flag_mask;
@@ -41,7 +43,6 @@ config.icons.forEach((path) => {
     const icon = new RL_Image(path);
     icons.push(icon);
 });
-// RL_IsMouseButtonPressed
 RL_SetWindowIcons(...icons);
 
 const BG_COLOR = chroma(0x187a3e).rgb();
@@ -49,31 +50,36 @@ const MAIN_FONT = new RL_Font('fonts/GochiHand-Regular.ttf', 64);
 require('./assets.js');
 
 const Body = require("./body.js");
-const Dot = require("./entities/dot.js");
-const Player = require("./entities/player.js");
+const PatternSystem = require("./patterns.js");
+
+const ENT_CLASS = {
+    Projectile: require("./entities/projectile.js"),
+    Player: require("./entities/player.js"),
+    Dot:  require("./entities/dot.js"),
+};
+
+let STATES = {
+    TITLE: require("./states/title.js"),
+    MAIN: require("./states/main.js"),
+};
+
+STATES.current = STATES.TITLE;
 
 if (!GLOBAL_FLAGS.includes('show_mouse'))
     RL_SetCursorEnabled(false);
 
-let PLAYER_ENTITY = new Player(0, 0);
-ENTITIES.push(PLAYER_ENTITY);
-
+STATES.current.enter();
 function ENGINE_Update(dt) {
     globalThis.TIMER += dt;
 
-    for (let ent of ENTITIES)
-        ent.update(dt);
+    STATES.current.update(dt);
 }
 
 function ENGINE_Draw() {
-    RL_ClearBackground(BG_COLOR);
+    STATES.current.draw();
 
-    for (let ent of ENTITIES)
-        ent.draw();
-
-    RL_DrawTextEx(MAIN_FONT, "abcdefghijk", {x: 0, y: 0}, 64, 0, [255,255,255]);
-
-    // RL_DrawFPS();
+    if (GLOBAL_FLAGS.includes('fps'))
+        RL_DrawFPS();
 }
 
 function ENGINE_Shutdown() {

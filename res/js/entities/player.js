@@ -1,3 +1,5 @@
+const SFX_MAGIK = new RL_Sound("sfx/magik.ogg");
+
 class Wand {
     pos = new Vector2();
     cursor_pos = new Vector2();
@@ -6,7 +8,7 @@ class Wand {
     angle_offset = Math.PI/2;
 
     radius = 96;
-    backdraw = false;
+    backdraw = true;
 
     constructor(parent) {
         this.parent = parent;
@@ -87,19 +89,27 @@ class Player {
 
     velocity = new Vector2();
 
+    wand = new Wand(this);
+    pattern_sys = new PatternSystem(this);
+
     visual = {
         timer: 0,
         anim_scale: 0,
     };
 
     speed = 48;
+    collidable = true;
+
+    onCollision(collider) {
+        // if (collider.damageEntity)
+        //     collider.damageEntity(this);
+    }
 
     constructor(x = 0, y = 0) {
         this.body = new Body(
             GetAsset('texture.player'),
             GetAsset('texture.shadow')
         );
-        this.wand = new Wand(this);
 
         this.pos.x = x;
         this.pos.y = y;
@@ -159,12 +169,17 @@ class Player {
         this.pos.x += this.velocity.x * dt;
         this.pos.y += this.velocity.y * dt;
 
+        this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
+        this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
+
         this.velocity.x *= (1 - this.damping);
         this.velocity.y *= (1 - this.damping);
 
         if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
+            SFX_MAGIK.play();
+            SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
             const wand_pos = this.wand.getAbsolutePos();
-            globalThis.ENTITIES.push(new Dot(wand_pos.x, wand_pos.y));
+            globalThis.ENTITIES.push(new ENT_CLASS.Projectile(this, wand_pos.x, wand_pos.y, this.wand.angle, 512));
         }
 
         this.wand.update(dt);
