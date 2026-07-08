@@ -60,6 +60,7 @@ const PatternSystem = require("./patterns.js");
 const ENT_CLASS = {
     Projectile: require("./entities/projectile.js"),
     Player: require("./entities/player.js"),
+    Enemy: require("./entities/enemy.js"),
     Dot:  require("./entities/dot.js"),
 };
 
@@ -67,6 +68,16 @@ let STATES = {
     TITLE: require("./states/title.js"),
     MAIN: require("./states/main.js"),
 };
+
+(function() {
+    const prev_RL_SetCursorEnabled = RL_SetCursorEnabled;
+    globalThis.RL_SetCursorEnabled = (state) => {
+        if (GLOBAL_FLAGS.includes('cursor'))
+            return;
+
+        prev_RL_SetCursorEnabled(state);
+    }
+})();
 
 STATES.current = STATES.TITLE;
 
