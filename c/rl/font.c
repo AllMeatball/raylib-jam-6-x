@@ -32,13 +32,9 @@ JSValue CLASSCTOR_RL_Font(JSContext *ctx, JSValueConst new_target, int argc, JSV
         return JS_EXCEPTION;
     }
 
-    if ( !(path = JS_ToCString(ctx, argv[0])) ) {
-        JSValue err = JS_NewError(ctx);
-        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "invalid or null path string"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        JS_Throw(ctx, err);
-
+    path = JS_ToCString(ctx, argv[0]);
+    if (!path)
         return JS_EXCEPTION;
-    }
 
     JS_ToInt32(ctx, &font_size, argv[1]);
 
@@ -48,6 +44,7 @@ JSValue CLASSCTOR_RL_Font(JSContext *ctx, JSValueConst new_target, int argc, JSV
         return JS_EXCEPTION;
 
     *font = LoadFontEx(path, font_size, 0, 0);
+    JS_FreeCString(ctx, path);
 
     return obj;
 }

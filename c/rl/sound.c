@@ -29,13 +29,9 @@ JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JS
         return JS_EXCEPTION;
     }
 
-    if ( !(path = JS_ToCString(ctx, argv[0])) ) {
-        JSValue err = JS_NewError(ctx);
-        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "invalid or null path string"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
-        JS_Throw(ctx, err);
-
+    path = JS_ToCString(ctx, argv[0]);
+    if (!path)
         return JS_EXCEPTION;
-    }
 
     obj = Script_CreateOpaqueClass(ctx, new_target, CLASSID_RL_Sound, sound);
 
@@ -43,6 +39,7 @@ JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JS
         return JS_EXCEPTION;
 
     *sound = LoadSound(path);
+    JS_FreeCString(ctx, path);
 
     return obj;
 }
