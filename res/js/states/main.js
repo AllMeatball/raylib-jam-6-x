@@ -15,8 +15,29 @@ const MainState = {
         RL_SetCursorEnabled(false);
     },
 
+    debugKeys() {
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_C)) {
+            const mouse_pos = RL_GetMousePosition();
+            ENTITIES.push(
+                new ENT_CLASS.Enemy({
+                    target: this.PLAYER,
+                    x: mouse_pos.x,
+                    y: mouse_pos.y
+                })
+            );
+
+            // ENTITIES.push(
+            //     new ENT_CLASS.Dot(mouse_pos.x, mouse_pos.y)
+            // );
+        }
+    },
+
     update(dt) {
         CollisionSystem.update();
+
+        if (GLOBAL_FLAGS.includes('debug'))
+            this.debugKeys();
+
         for (let i = 0; i < ENTITIES.length; i++) {
             const ent = ENTITIES[i];
             if (ent.delete) {
@@ -31,12 +52,11 @@ const MainState = {
 
     draw() {
         RL_ClearBackground(BG_COLOR);
-        RL_DrawTextEx(MAIN_FONT, `Level: ${this.level}`, {x: 0, y: 0}, 64, 4, [255,255,255]);
 
         for (ent of ENTITIES)
             ent.draw();
 
-        // RL_DrawFPS();
+        RL_DrawTextEx(MAIN_FONT, `Level: ${this.level}`, {x: 0, y: 0}, 64, 4, [255,255,255]);
     }
 };
 

@@ -4,6 +4,8 @@ class CommonModule {
 
 export function require(path) {
     // const module_name = path;
+    // console.log(new Error().stack);
+    // console.log(path);
 
     if (path.startsWith('./') || path.startsWith('../'))
         path = FS_AbsolutePath("js/"+path);
