@@ -63,8 +63,8 @@ class Wand {
 
     draw() {
         const wand_center = {
-            x: (this.texture.width  * this.parent.body.texture_scale) * 0.5,
-            y: (this.texture.height * this.parent.body.texture_scale) * 0.5,
+            x: (this.texture.width  * this.parent.body.scale) * 0.5,
+            y: (this.texture.height * this.parent.body.scale) * 0.5,
         };
 
         const pos = this.getAbsolutePos();
@@ -73,7 +73,7 @@ class Wand {
             wand_center,
             pos,
             (this.angle_offset + this.angle) * RAD2DEG,
-            {x: this.parent.body.texture_scale},
+            {x: this.parent.body.scale},
             this.parent.color
         );
 
@@ -122,10 +122,10 @@ class Player {
         this.pos.x = x;
         this.pos.y = y;
 
-        this.hitbox.x *= this.body.texture_scale;
-        this.hitbox.y *= this.body.texture_scale;
-        this.hitbox.width *= this.body.texture_scale;
-        this.hitbox.height *= this.body.texture_scale;
+        this.hitbox.x *= this.body.scale;
+        this.hitbox.y *= this.body.scale;
+        this.hitbox.width  *= this.body.scale;
+        this.hitbox.height *= this.body.scale;
     }
 
     getHitbox() {
@@ -192,17 +192,12 @@ class Player {
     }
 
     draw() {
-        // const anim_scale = this.visual.anim_scale;
         const pos_offset = {
             x: 0,
             y: (Math.abs(Math.cos(this.visual.timer * 8.0)  * 4.0) - 4) * this.visual.anim_scale,
         };
 
         const angle = (Math.cos(this.visual.timer * 9.0)) * this.visual.anim_scale;
-
-        // pos.x += this.pos.x;
-        // pos.y += this.pos.y;
-
 
         if (this.wand.backdraw)
             this.wand.draw();
