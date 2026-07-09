@@ -164,16 +164,20 @@ class Vector2 {
         this.y += vec2.y;
     }
 
+
     copy() {
         return new Vector2(this.x, this.y);
     }
 
-    mangitude() {
+    dot(other) {
+        return this.x * other.x + this.y * other.y;
+    }
+
+    magnitude() {
         return GetVectorMagnitude(this.x, this.y);
     }
 
     normalize() {
-        const mangitude = this.mangitude();
         const magnitude = this.magnitude();
 
         this.x /= magnitude;
