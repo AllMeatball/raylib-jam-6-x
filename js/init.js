@@ -174,13 +174,14 @@ class Vector2 {
 
     normalize() {
         const mangitude = this.mangitude();
+        const magnitude = this.magnitude();
 
-        this.x /= mangitude;
-        this.y /= mangitude;
+        this.x /= magnitude;
+        this.y /= magnitude;
     }
 
     circleClamp(radius) {
-        if (this.mangitude() > radius) {
+        if (this.magnitude() > radius) {
             this.normalize();
             this.x *= radius;
             this.y *= radius;
