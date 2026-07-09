@@ -480,6 +480,61 @@ JSValue RL_SetCursorEnabled_JSAPI(JSContext *ctx, JSValueConst this_val, int arg
     return JS_UNDEFINED;
 }
 
+JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc < 2) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "this, ...rects not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    JSValue callback = JS_GetPropertyStr(ctx, argv[0], "collisionCallback");
+
+    if (JS_IsUndefined(callback))
+        return JS_EXCEPTION;
+
+    int boxes_count = argc - 1;
+    Rectangle *rects = js_mallocz(ctx, boxes_count * sizeof(Rectangle));
+
+    if (!rects)
+        return JS_EXCEPTION;
+
+    for (int i = 0; i < boxes_count; i++)
+        rects[i] = RL_GetRectangle(ctx, argv[i+1]);
+
+    JSValue rect_pair[2];
+    for (int i = 0; i < boxes_count; i++) {
+        Rectangle rect1 = rects[i];
+
+        // TODO: no double iter here
+        for (int j = 0; j < boxes_count; j++) {
+            if (i == j)
+                continue;
+
+            Rectangle rect2 = rects[j];
+            if (CheckCollisionRecs(rect1, rect2)) {
+                rect_pair[0] = argv[i+1];
+                rect_pair[1] = argv[j+1];
+
+                JSValue result = JS_Call(ctx, callback, argv[0], 2, rect_pair);
+
+                if (JS_IsException(result)) {
+                    JS_FreeValue(ctx, callback);
+                    return JS_EXCEPTION;
+                }
+
+                JS_FreeValue(ctx, result);
+            }
+        }
+    }
+
+
+    // js_free(ctx, rects);
+    JS_FreeValue(ctx, callback);
+    return JS_UNDEFINED;
+}
+
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_RenderTexture);
@@ -520,6 +575,7 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
 
 
     ScriptEngine_RegisterFunc(engine, RL_DrawRectangle);
+    ScriptEngine_RegisterFunc(engine, RL_HandleBulkCollisionCheck);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
 }
