@@ -23,10 +23,18 @@ enemy_texture.genMipmaps();
 enemy_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_REPEAT;
 enemy_texture.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
 
+const wizard_hat = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/icon.png", "texture.hat");
+wizard_hat.genMipmaps();
+wizard_hat.wrap = RL_TextureWrap.TEXTURE_WRAP_REPEAT;
+wizard_hat.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
+
 // const atlas = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/atlas.png", "texture.atlas");
 // atlas.genMipmaps();
 // atlas.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
 // atlas.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
 
 LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-tower.ogg", "music.wizardtower");
-// LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-title.ogg", "music.title");
+LoadAsset(ASSET_TYPE.MUSIC, "music/yes-sire.ogg", "music.title");
+
+LoadAsset(ASSET_TYPE.SOUND, "sfx/oh-no.wav", "sfx.gameover");
+

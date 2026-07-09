@@ -7,10 +7,18 @@ const TitleState = {
         height: 0
     },
 
-    enter() { },
+    enter() {
+        this.hat = GetAsset('texture.hat');
+        this.song = GetAsset('music.title');
+        this.song.play();
+
+        RL_SetCursorEnabled(true);
+    },
 
     update(dt) {
         if (this.textIsClicked() && RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
+            this.song.stop();
+
             STATES.current = STATES.MAIN;
             STATES.current.enter();
         }
@@ -27,29 +35,19 @@ const TitleState = {
         );
     },
 
-    drawCenterText(font, text, ratio_x, ratio_y, font_size, color) {
-        const text_size = RL_MeasureTextEx(font, text, font_size, 4);
-        const position = {
-            x: SCREEN_SIZE * 0.5 - (text_size.x * ratio_x),
-            y: SCREEN_SIZE * 0.5 - (text_size.y * ratio_y)
-        };
-
-        RL_DrawTextEx(
-            font,
-            text,
-            position,
-            font_size, 4,
-            color
-        );
-
-        return [position, text_size];
-    },
-
     draw() {
         RL_ClearBackground(BG_COLOR);
 
-        this.drawCenterText(TITLE_FONT, "Hexzard", 0.5, 0.75, 256, this.title_color);
-        const result = this.drawCenterText(MAIN_FONT, "Click me to start", 0.5 + (Math.cos(TIMER * 4) * 0.02), -3 + (Math.sin(TIMER * 4) * 0.02), 64, [255,255,255]);
+        const title_text_info = RL_DrawCenterText(TITLE_FONT, "Hexzard", 0.5, 0.75, 256, this.title_color);
+
+
+        const hat_pos = title_text_info[0];
+        hat_pos.x -= 64;
+        hat_pos.y -= 24;
+
+        this.hat.draw(hat_pos, 0, 0.35, [255,255,255]);
+
+        const result = RL_DrawCenterText(MAIN_FONT, "Click me to start", 0.5 + (Math.cos(TIMER * 4) * 0.02), -3 + (Math.sin(TIMER * 4) * 0.02), 64, [255,255,255]);
 
         const position = result[0];
         this.text_button.x = position.x;
