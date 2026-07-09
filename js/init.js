@@ -83,7 +83,8 @@ globalThis.FS_AbsolutePath = function(path) {
 globalThis.ASSET_TYPE = Object.freeze({
     IMAGE: 0,
     TEXTURE: 1,
-    MUSIC: 2,
+    SOUND: 2,
+    MUSIC: 3,
 });
 
 globalThis.require = require;
@@ -101,6 +102,9 @@ globalThis.LoadAsset = function(type, path, key) {
             break;
         case ASSET_TYPE.MUSIC:
             asset = new RL_MusicStream(path);
+            break;
+        case ASSET_TYPE.SOUND:
+            asset = new RL_Sound(path);
             break;
     }
 
