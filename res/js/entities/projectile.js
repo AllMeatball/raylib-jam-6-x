@@ -2,6 +2,7 @@ class Projectile {
     pos = new Vector2();
     angle = 0;
     speed = 0;
+    damage = 10;
     radius = 16;
 
     decay_target = 0.8;
@@ -13,10 +14,22 @@ class Projectile {
 
     collidable = true;
 
+    onCollision(other) {
+        if (other instanceof Projectile)
+            return;
+
+        if (other === this.creator)
+            return;
+
+        other.doDamage(this.damage, this.angle);
+        this.delete = true;
+    }
+
     constructor(creator, x, y, angle, speed) {
         this.pos.x = x;
         this.pos.y = y;
         this.texture = GetAsset('texture.projectile');
+        this.color = this.base_color.darken(Math.sin(TIMER * 8.0)).rgb();
 
         this.angle = angle;
         this.speed = speed;

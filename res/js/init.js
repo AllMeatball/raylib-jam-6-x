@@ -79,7 +79,11 @@ let STATES = {
     }
 })();
 
-STATES.current = STATES.TITLE;
+if (GLOBAL_FLAGS.includes('main_state')) {
+    STATES.current = STATES.MAIN;
+} else {
+    STATES.current = STATES.TITLE;
+}
 
 STATES.current.enter();
 function ENGINE_Update(dt) {
@@ -90,6 +94,7 @@ function ENGINE_Update(dt) {
 }
 
 function ENGINE_Draw() {
+    // RL_ClearBackground([0,0,0]);
     STATES.current.draw();
 
     if (GLOBAL_FLAGS.includes('fps'))

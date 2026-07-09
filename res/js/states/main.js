@@ -30,6 +30,19 @@ const MainState = {
             //     new ENT_CLASS.Dot(mouse_pos.x, mouse_pos.y)
             // );
         }
+
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_K)) {
+            for (let i = 0; i < 100; i++) {
+            const mouse_pos = RL_GetMousePosition();
+            ENTITIES.push(
+                new ENT_CLASS.Enemy({
+                    target: this.PLAYER,
+                    x: mouse_pos.x,
+                    y: mouse_pos.y
+                })
+            );
+            }
+        }
     },
 
     update(dt) {
@@ -38,11 +51,10 @@ const MainState = {
         if (GLOBAL_FLAGS.includes('debug'))
             this.debugKeys();
 
-        for (let i = 0; i < ENTITIES.length; i++) {
+        for (let i = ENTITIES.length - 1; i >= 0; i--) {
             const ent = ENTITIES[i];
             if (ent.delete) {
                 ENTITIES.splice(i, 1);
-                i--;
                 continue;
             }
 
@@ -55,6 +67,10 @@ const MainState = {
 
         for (ent of ENTITIES)
             ent.draw();
+
+        if (GLOBAL_FLAGS.includes('debug'))
+            RL_DrawTextEx(MAIN_FONT, `#ENTS: ${ENTITIES.length}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, [255,0,0]);
+
 
         RL_DrawTextEx(MAIN_FONT, `Level: ${this.level}`, {x: 0, y: 0}, 64, 4, [255,255,255]);
     }

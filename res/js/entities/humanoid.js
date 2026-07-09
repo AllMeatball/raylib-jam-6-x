@@ -1,6 +1,7 @@
 class Humanoid {
     pos = new Vector2();
     dir = new Vector2();
+    health = 100;
 
     color = [255,255,255];
 
@@ -19,15 +20,27 @@ class Humanoid {
     visual = {
         timer: 0,
         anim_scale: 0,
+        dir_x: 1,
     };
 
     speed = 48;
     collidable = true;
 
-    onCollision(collider) {
-        // if (collider.damageEntity)
-        //     collider.damageEntity(this);
+    doDamage(damage, angle) {
+        this.health -= damage;
+
+        if (angle) {
+            const force = damage * 42;
+            this.velocity.x += Math.cos(angle) * force;
+            this.velocity.y += Math.sin(angle) * force;
+        }
     }
+
+    onDeath() {
+        this.delete = true;
+    }
+
+    onCollision() {}
 
     constructor(params) {
         this.pos.x = params.x;
@@ -52,6 +65,11 @@ class Humanoid {
     }
 
     update(dt) {
+        if (this.health < 0) {
+            this.onDeath();
+            return;
+        }
+
         let moving_x = Math.abs(this.dir.x) > 0;
         let moving_y = Math.abs(this.dir.y) > 0;
 
@@ -110,7 +128,8 @@ class Humanoid {
                 y: this.pos.y + center.y
             };
 
-            RL_DrawCircle(player_origin, this.wand.radius, chroma('yellow').alpha(0.5).rgba());
+            if (this instanceof ENT_CLASS.Player)
+                RL_DrawCircle(player_origin, this.wand.radius, chroma('yellow').alpha(0.5).rgba());
         }
     }
 }
