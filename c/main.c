@@ -19,6 +19,9 @@ JSValue ENGINE_Draw     = JS_UNDEFINED;
 JSValue ENGINE_Shutdown = JS_UNDEFINED;
 
 ScriptEngine *engine = NULL;
+bool has_shutdown = false;
+bool restart = false;
+bool running = true;
 
 void GameUpdate() {
     float dt = GetFrameTime();
@@ -32,6 +35,9 @@ void GameUpdate() {
 }
 
 void GameShutdown() {
+    if (has_shutdown)
+        return;
+
     CloseAudioDevice();
     ScriptEngine_CallFunction(engine, ENGINE_Shutdown, 0, NULL, NULL);
 
@@ -44,9 +50,29 @@ void GameShutdown() {
     PHYSFS_deinit();
     ScriptEngine_Destroy(engine);
     printf("Exiting...\n");
+
+    SetLoadFileDataCallback(NULL);
+    SetSaveFileDataCallback(NULL);
+
+    SetLoadFileTextCallback(NULL);
+    ChangeDirectory(GetApplicationDirectory());
+
+    has_shutdown = true;
+}
+
+JSValue ENGINE_Restart_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    printf("Restarting...");
+    running = false;
+    restart = true;
+    return JS_UNDEFINED;
 }
 
 int main(int argc, char **argv) {
+    do {
+    restart = false;
+    has_shutdown = false;
+    running = true;
+
     if (!PHYSFS_init(argv[0])) {
         fprintf(stderr, "FS init failed: %s\n", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
         return 1;
@@ -65,6 +91,8 @@ int main(int argc, char **argv) {
 
     RL_LoadAtoms(engine);
     RL_LoadScriptingFunctions(engine);
+
+    ScriptEngine_RegisterFunc(engine, ENGINE_Restart);
 
     // ScriptEngine_Eval(engine, NULL, "<debug:init>", "import * as os  from \"os\"; console.log(os.readdir('.'));", 0, JS_EVAL_TYPE_MODULE);
 
@@ -92,6 +120,8 @@ int main(int argc, char **argv) {
     ChangeDirectory("res");
 
     InitAudioDevice();
+    SetMasterVolume(0.35);
+
     script_data = LoadFileText("js/init.js");
     if (!script_data)
         return 1;
@@ -111,10 +141,13 @@ int main(int argc, char **argv) {
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(GameUpdate, 0, 1);
 #else
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose() && running) {
         GameUpdate();
     }
 #endif
+
+    GameShutdown();
+    } while (restart);
 
     return 0;
 }

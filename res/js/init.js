@@ -87,6 +87,11 @@ if (GLOBAL_FLAGS.includes('main_state')) {
 
 STATES.current.enter();
 function ENGINE_Update(dt) {
+    if (GLOBAL_FLAGS.includes('debug')) {
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_TAB))
+            ENGINE_Restart();
+    }
+
     MusicUpdate();
 
     globalThis.TIMER += dt;
