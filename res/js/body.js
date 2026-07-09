@@ -26,11 +26,11 @@ class Body {
         };
     }
 
-    drawSprite(pos, center, angle, scale, color) {
+    drawSprite(pos, center, angle, scale, color, flip) {
         const src = {
             x: this.rect.x,
             y: this.rect.y,
-            width:  this.rect.width,
+            width:  this.rect.width * (flip ? -1 : 1),
             height: this.rect.height,
         };
 
@@ -50,7 +50,7 @@ class Body {
         );
     }
 
-    draw(pos, pos_offset, angle, scale, color) {
+    draw(pos, pos_offset, angle, scale, color, flip) {
         if (scale.y === undefined)
             scale.y = scale.x;
 
@@ -78,6 +78,7 @@ class Body {
                 height: this.rect.height * this.scale
             }, chroma('cyan').alpha(0.5).rgba());
         }
+
         this.shadow_texture.drawPro(src, dest, {x: 0, y: 0}, 0, [0,0,0, 0.20]);
         // console.log(pos_offset);
 
@@ -89,7 +90,7 @@ class Body {
             {
                 x: (pos_offset.x + center.x + pos.x),
                 y: (pos_offset.y + center.y + pos.y)
-            }, center, angle, scale, color
+            }, center, angle, scale, color, flip
         );
     }
 }

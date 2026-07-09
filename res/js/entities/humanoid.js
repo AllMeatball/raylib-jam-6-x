@@ -85,6 +85,9 @@ class Humanoid {
 
         this.velocity.x *= (1 - this.damping);
         this.velocity.y *= (1 - this.damping);
+
+        if (this.dir.x > 0 || this.dir.x < 0)
+            this.visual.dir_x = Math.sign(this.dir.x);
     }
 
     draw() {
@@ -95,7 +98,8 @@ class Humanoid {
 
         const angle = (Math.cos(this.visual.timer * 9.0)) * this.visual.anim_scale;
 
-        this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.color);
+        this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.color, this.visual.dir_x < 0);
+
         if (GLOBAL_FLAGS.includes("boxes")) {
             const center = this.body.getCenter();
             const hitbox = this.getHitbox();
