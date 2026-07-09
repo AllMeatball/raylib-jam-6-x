@@ -4,6 +4,7 @@ import * as std from "std";
 import {
     RL_ConfigFlags,
     RL_DrawCircle,
+    RL_DrawCenterText,
     RL_DrawTextureAtOrigin,
     RL_TextureWrap,
     RL_TextureFilter,
@@ -52,6 +53,7 @@ delete globalThis.FS_Mount;
 globalThis.RL_ConfigFlags = RL_ConfigFlags;
 globalThis.RL_DrawCircle  = RL_DrawCircle;
 globalThis.RL_DrawTextureAtOrigin = RL_DrawTextureAtOrigin;
+globalThis.RL_DrawCenterText = RL_DrawCenterText;
 
 globalThis.RL_TextureFilter = RL_TextureFilter;
 globalThis.RL_TextureWrap   = RL_TextureWrap;

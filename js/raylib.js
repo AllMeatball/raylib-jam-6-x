@@ -194,3 +194,21 @@ export function RL_DrawTextureAtOrigin(texture, origin, position, rotation, scal
     texture.drawPro(src, dest, origin, rotation, color);
 }
 
+export function RL_DrawCenterText(font, text, ratio_x, ratio_y, font_size, color) {
+    const text_size = RL_MeasureTextEx(font, text, font_size, 4);
+    const position = {
+        x: SCREEN_SIZE * 0.5 - (text_size.x * ratio_x),
+        y: SCREEN_SIZE * 0.5 - (text_size.y * ratio_y)
+    };
+
+    RL_DrawTextEx(
+        font,
+        text,
+        position,
+        font_size, 4,
+        color
+    );
+
+    return [position, text_size];
+}
+
