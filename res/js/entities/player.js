@@ -84,6 +84,11 @@ class Wand {
 class Player extends Humanoid {
     wand = new Wand(this);
 
+    onDeath() {
+        super.onDeath();
+        STATES.current.doGameover();
+    }
+
     constructor(params) {
         super(params);
 

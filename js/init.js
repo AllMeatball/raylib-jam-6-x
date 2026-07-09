@@ -143,6 +143,13 @@ globalThis.getRandomInt = function(min, max) {
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
 }
 
+globalThis.secondsToString = function(seconds) {
+    if (seconds >= 60)
+        return Math.floor(seconds / 60).toString();
+
+    return std.sprintf("%.2fs", seconds);
+}
+
 globalThis.RAD2DEG = 180 / Math.PI;
 
 globalThis.MirrorRange = (value, x) => (value >= -x && value <= x);

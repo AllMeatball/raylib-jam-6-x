@@ -109,12 +109,13 @@ class Humanoid {
     }
 
     draw() {
+        const speed = this.speed / 6;
         const pos_offset = {
             x: 0,
-            y: (Math.abs(Math.cos(this.visual.timer * 8.0)  * 4.0) - 4) * this.visual.anim_scale,
+            y: (Math.abs(Math.cos(this.visual.timer * speed)  * 4.0) - 4) * this.visual.anim_scale,
         };
 
-        const angle = (Math.cos(this.visual.timer * 9.0)) * this.visual.anim_scale;
+        const angle = (Math.cos(this.visual.timer * (speed * 1.125))) * this.visual.anim_scale;
 
         this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.color, this.visual.dir_x < 0);
 
