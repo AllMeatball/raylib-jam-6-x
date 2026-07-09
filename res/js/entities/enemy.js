@@ -27,6 +27,8 @@ class Enemy extends Humanoid {
         super(params);
 
         const atlas = GetAsset('texture.enemy');
+
+        this.hitbox.group = 2;
         this.setupBody(
             atlas,
             GetAsset('texture.shadow'),

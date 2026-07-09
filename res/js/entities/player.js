@@ -87,6 +87,8 @@ class Player extends Humanoid {
     constructor(params) {
         super(params);
 
+        this.hitbox.group = 1;
+
         this.setupBody(
             GetAsset('texture.player'),
             GetAsset('texture.shadow')
