@@ -584,11 +584,11 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
 }
 
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
+    CLASSOBJ_RL_Sound = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_RenderTexture);
 
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Image);
-    SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_MusicStream);
 
     SCRIPTENGINE_DEFINE_CLASS(engine, RL_Font, NULL, 0);
