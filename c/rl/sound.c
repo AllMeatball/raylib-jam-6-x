@@ -2,9 +2,9 @@
 SCRIPTENGINE_DEFINE_ID(RL_Sound);
 
 void CLASSFINAL_RL_Sound(JSRuntime *rt, JSValue val) {
-    Sound *sound = JS_GetOpaque(val, CLASSID_RL_Sound);
-    if (sound)
-        UnloadSound(*sound);
+    struct RL_SoundWrap *sound = JS_GetOpaque(val, CLASSID_RL_Sound);
+    if (IsSoundValid(sound->sound))
+        UnloadSound(sound->sound);
     else
         return;
 
@@ -12,11 +12,11 @@ void CLASSFINAL_RL_Sound(JSRuntime *rt, JSValue val) {
 }
 
 JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JSValueConst *argv) {
-    Sound *sound = NULL;
+    struct RL_SoundWrap *sound = NULL;
     JSValue obj = JS_UNDEFINED;
     const char *path = NULL;
 
-    sound = js_mallocz(ctx, sizeof(Sound));
+    sound = js_mallocz(ctx, sizeof(struct RL_SoundWrap));
 
     if (!sound)
         return JS_EXCEPTION;
@@ -38,18 +38,22 @@ JSValue CLASSCTOR_RL_Sound(JSContext *ctx, JSValueConst new_target, int argc, JS
     if (JS_IsException(obj))
         return JS_EXCEPTION;
 
-    *sound = LoadSound(path);
+    Wave wave = LoadWave(path);
+    sound->sound = LoadSoundFromWave(wave);
+    sound->duration = ((double)wave.frameCount / wave.channels) / wave.sampleRate;
+    UnloadWave(wave);
+
     JS_FreeCString(ctx, path);
 
     return obj;
 }
 
 JSValue CLASSFUNC_RL_Sound_Play(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
     if (!sound)
         return JS_EXCEPTION;
 
-    PlaySound(*sound);
+    PlaySound(sound->sound);
     return JS_UNDEFINED;
 }
 
@@ -74,28 +78,36 @@ JSValue CLASSFUNC_RL_Sound_SetPitch(JSContext *ctx, JSValueConst this_val, int a
 
 
 JSValue CLASSFUNC_RL_Sound_Stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
     if (!sound)
         return JS_EXCEPTION;
 
-    StopSound(*sound);
+    StopSound(sound->sound);
     return JS_UNDEFINED;
 }
 
 JSValue CLASSFUNC_RL_Sound_Pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
     if (!sound)
         return JS_EXCEPTION;
 
-    PauseSound(*sound);
+    PauseSound(sound->sound);
     return JS_UNDEFINED;
 }
 
 JSValue CLASSFUNC_RL_Sound_Resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
     if (!sound)
         return JS_EXCEPTION;
 
-    ResumeSound(*sound);
+    ResumeSound(sound->sound);
     return JS_UNDEFINED;
+}
+
+JSValue CLASSFUNC_RL_Sound_GetDuration(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    if (!sound)
+        return JS_EXCEPTION;
+
+    return JS_NewFloat64(ctx, sound->duration);
 }
