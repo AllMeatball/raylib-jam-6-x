@@ -23,5 +23,10 @@ enemy_texture.genMipmaps();
 enemy_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_REPEAT;
 enemy_texture.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
 
+// const atlas = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/atlas.png", "texture.atlas");
+// atlas.genMipmaps();
+// atlas.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
+// atlas.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
+
 LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-tower.ogg", "music.wizardtower");
 // LoadAsset(ASSET_TYPE.MUSIC, "music/wizard-title.ogg", "music.title");
