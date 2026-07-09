@@ -39,6 +39,8 @@ void GameShutdown() {
     JS_FreeValue(engine->ctx, ENGINE_Draw);
     JS_FreeValue(engine->ctx, ENGINE_Shutdown);
 
+
+    RL_UnloadAtoms(engine);
     PHYSFS_deinit();
     ScriptEngine_Destroy(engine);
     printf("Exiting...\n");
@@ -60,6 +62,8 @@ int main(int argc, char **argv) {
     atexit(GameShutdown);
 
     FS_LoadScriptingFunctions(engine);
+
+    RL_LoadAtoms(engine);
     RL_LoadScriptingFunctions(engine);
 
     // ScriptEngine_Eval(engine, NULL, "<debug:init>", "import * as os  from \"os\"; console.log(os.readdir('.'));", 0, JS_EVAL_TYPE_MODULE);

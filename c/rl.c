@@ -15,6 +15,9 @@
 
 #include "rl/font.h"
 
+JSAtom RL_ATOM_X, RL_ATOM_Y;
+JSAtom RL_ATOM_WIDTH, RL_ATOM_HEIGHT;
+
 Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
     Color color = {};
 
@@ -57,8 +60,8 @@ Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
 Vector2 RL_GetVector2(JSContext *ctx, JSValue vector_obj) {
     Vector2 vector = {};
 
-    JSValue x = JS_GetPropertyStr(ctx, vector_obj, "x");
-    JSValue y = JS_GetPropertyStr(ctx, vector_obj, "y");
+    JSValue x = JS_GetProperty(ctx, vector_obj, RL_ATOM_X);
+    JSValue y = JS_GetProperty(ctx, vector_obj, RL_ATOM_Y);
 
 
     double val_f64;
@@ -77,8 +80,8 @@ Vector2 RL_GetVector2(JSContext *ctx, JSValue vector_obj) {
 JSValue RL_CreateVector2(JSContext *ctx, Vector2 vector) {
     JSValue vector_obj = JS_NewObject(ctx);
 
-    JS_SetPropertyStr(ctx, vector_obj, "x", JS_NewFloat64(ctx, vector.x));
-    JS_SetPropertyStr(ctx, vector_obj, "y", JS_NewFloat64(ctx, vector.y));
+    JS_SetProperty(ctx, vector_obj, RL_ATOM_X, JS_NewFloat64(ctx, vector.x));
+    JS_SetProperty(ctx, vector_obj, RL_ATOM_Y, JS_NewFloat64(ctx, vector.y));
 
     return vector_obj;
 }
@@ -86,11 +89,11 @@ JSValue RL_CreateVector2(JSContext *ctx, Vector2 vector) {
 Rectangle RL_GetRectangle(JSContext *ctx, JSValue rect_obj) {
     Rectangle rect = {};
 
-    JSValue x = JS_GetPropertyStr(ctx, rect_obj, "x");
-    JSValue y = JS_GetPropertyStr(ctx, rect_obj, "y");
+    JSValue x = JS_GetProperty(ctx, rect_obj, RL_ATOM_X);
+    JSValue y = JS_GetProperty(ctx, rect_obj, RL_ATOM_Y);
 
-    JSValue width  = JS_GetPropertyStr(ctx, rect_obj, "width");
-    JSValue height = JS_GetPropertyStr(ctx, rect_obj, "height");
+    JSValue width  = JS_GetProperty(ctx, rect_obj, RL_ATOM_WIDTH);
+    JSValue height = JS_GetProperty(ctx, rect_obj, RL_ATOM_HEIGHT);
 
 
     double val_f64;
@@ -519,4 +522,21 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     ScriptEngine_RegisterFunc(engine, RL_DrawRectangle);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
+}
+
+// NOTE: for future devs using QuickJS. using atoms can gain you a lot performance --
+// I was really under the assumption that it was badly batched draw calls.
+void RL_LoadAtoms(ScriptEngine *engine) {
+    RL_ATOM_X = JS_NewAtom(engine->ctx, "x");
+    RL_ATOM_Y = JS_NewAtom(engine->ctx, "y");
+
+    RL_ATOM_WIDTH  = JS_NewAtom(engine->ctx, "width");
+    RL_ATOM_HEIGHT = JS_NewAtom(engine->ctx, "height");
+}
+
+void RL_UnloadAtoms(ScriptEngine *engine) {
+    JS_FreeAtom(engine->ctx, RL_ATOM_X);
+    JS_FreeAtom(engine->ctx, RL_ATOM_Y);
+    JS_FreeAtom(engine->ctx, RL_ATOM_WIDTH);
+    JS_FreeAtom(engine->ctx, RL_ATOM_HEIGHT);
 }
