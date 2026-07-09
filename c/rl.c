@@ -17,6 +17,27 @@
 
 JSAtom RL_ATOM_X, RL_ATOM_Y;
 JSAtom RL_ATOM_WIDTH, RL_ATOM_HEIGHT;
+JSAtom RL_ATOM_GROUP;
+
+// NOTE: for future devs using QuickJS. using atoms can gain you a lot performance --
+// I was really under the assumption that it was badly batched draw calls.
+void RL_LoadAtoms(ScriptEngine *engine) {
+    RL_ATOM_X = JS_NewAtom(engine->ctx, "x");
+    RL_ATOM_Y = JS_NewAtom(engine->ctx, "y");
+
+    RL_ATOM_WIDTH  = JS_NewAtom(engine->ctx, "width");
+    RL_ATOM_HEIGHT = JS_NewAtom(engine->ctx, "height");
+
+    RL_ATOM_GROUP = JS_NewAtom(engine->ctx, "group");
+}
+
+void RL_UnloadAtoms(ScriptEngine *engine) {
+    JS_FreeAtom(engine->ctx, RL_ATOM_X);
+    JS_FreeAtom(engine->ctx, RL_ATOM_Y);
+    JS_FreeAtom(engine->ctx, RL_ATOM_WIDTH);
+    JS_FreeAtom(engine->ctx, RL_ATOM_HEIGHT);
+    JS_FreeAtom(engine->ctx, RL_ATOM_GROUP);
+}
 
 Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
     Color color = {};
@@ -480,6 +501,13 @@ JSValue RL_SetCursorEnabled_JSAPI(JSContext *ctx, JSValueConst this_val, int arg
     return JS_UNDEFINED;
 }
 
+#define RL_GLOBAL_GROUP (0)
+
+struct RL_CollisonBox {
+    Rectangle rect;
+    uint32_t group;
+};
+
 JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     if (argc < 2) {
         JSValue err = JS_NewError(ctx);
@@ -495,25 +523,45 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
         return JS_EXCEPTION;
 
     int boxes_count = argc - 1;
-    Rectangle *rects = js_mallocz(ctx, boxes_count * sizeof(Rectangle));
+    struct RL_CollisonBox *boxes = js_mallocz(ctx, boxes_count * sizeof(struct RL_CollisonBox));
 
-    if (!rects)
+    if (!boxes)
         return JS_EXCEPTION;
 
-    for (int i = 0; i < boxes_count; i++)
-        rects[i] = RL_GetRectangle(ctx, argv[i+1]);
+    for (int i = 0; i < boxes_count; i++) {
+        struct RL_CollisonBox *box = boxes + i;
+        box->rect = RL_GetRectangle(ctx, argv[i+1]);
+        JSValue group_obj = JS_GetProperty(ctx, argv[i+1], RL_ATOM_GROUP);
+
+        if (JS_IsUndefined(group_obj))
+            boxes[i].group = RL_GLOBAL_GROUP;
+        else
+            JS_ToUint32(ctx, &box->group, group_obj);
+
+        JS_FreeValue(ctx, group_obj);
+    }
 
     JSValue rect_pair[2];
     for (int i = 0; i < boxes_count; i++) {
-        Rectangle rect1 = rects[i];
+        struct RL_CollisonBox box1 = boxes[i];
 
         // TODO: no double iter here
         for (int j = 0; j < boxes_count; j++) {
             if (i == j)
                 continue;
 
-            Rectangle rect2 = rects[j];
-            if (CheckCollisionRecs(rect1, rect2)) {
+            struct RL_CollisonBox box2 = boxes[j];
+
+            uint32_t group_mask = (box1.group & box2.group);
+
+            if (group_mask == RL_GLOBAL_GROUP)
+                goto check_collisions;
+
+            if ( (box1.group ^ group_mask) == 0 )
+                continue;
+
+            check_collisions:
+            if (CheckCollisionRecs(box1.rect, box2.rect)) {
                 rect_pair[0] = argv[i+1];
                 rect_pair[1] = argv[j+1];
 
@@ -549,6 +597,9 @@ void RL_LoadScriptingClasses(ScriptEngine *engine) {
 void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     RL_LoadScriptingClasses(engine);
 
+    JSValue rl_global_group = JS_NewUint32(engine->ctx, RL_GLOBAL_GROUP);
+    JS_SetPropertyStr(engine->ctx, engine->globals, "RL_GLOBAL_GROUP", rl_global_group);
+
     ScriptEngine_RegisterFunc(engine, RL_LoadFileData);
     ScriptEngine_RegisterFunc(engine, RL_LoadFileText);
 
@@ -578,21 +629,4 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     ScriptEngine_RegisterFunc(engine, RL_HandleBulkCollisionCheck);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
-}
-
-// NOTE: for future devs using QuickJS. using atoms can gain you a lot performance --
-// I was really under the assumption that it was badly batched draw calls.
-void RL_LoadAtoms(ScriptEngine *engine) {
-    RL_ATOM_X = JS_NewAtom(engine->ctx, "x");
-    RL_ATOM_Y = JS_NewAtom(engine->ctx, "y");
-
-    RL_ATOM_WIDTH  = JS_NewAtom(engine->ctx, "width");
-    RL_ATOM_HEIGHT = JS_NewAtom(engine->ctx, "height");
-}
-
-void RL_UnloadAtoms(ScriptEngine *engine) {
-    JS_FreeAtom(engine->ctx, RL_ATOM_X);
-    JS_FreeAtom(engine->ctx, RL_ATOM_Y);
-    JS_FreeAtom(engine->ctx, RL_ATOM_WIDTH);
-    JS_FreeAtom(engine->ctx, RL_ATOM_HEIGHT);
 }
