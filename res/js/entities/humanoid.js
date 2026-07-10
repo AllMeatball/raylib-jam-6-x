@@ -4,6 +4,7 @@ class Humanoid {
     health = 100;
 
     color = [255,255,255];
+    current_color = [255,255,255];
     color_target = chroma('orangered').rgb();
 
     color_blend = 0;
@@ -154,7 +155,8 @@ class Humanoid {
 
         const angle = (Math.cos(this.visual.timer * (speed * 1.125)) + this.visual.extra_angle) * this.visual.anim_scale;
 
-        this.body.draw(this.pos, pos_offset, angle, {x: 1}, chroma(this.color).mix(this.color_target, this.color_blend).rgb(), this.visual.dir_x < 0);
+        this.current_color = chroma(this.color).mix(this.color_target, this.color_blend).rgb();
+        this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.current_color, this.visual.dir_x < 0);
 
         if (GLOBAL_FLAGS.includes("boxes")) {
             const hitbox = this.getHitbox();

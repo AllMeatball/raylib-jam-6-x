@@ -102,8 +102,8 @@ class Hivemind {
             }
         }
 
-        // if (!new_leader)
-        //     return;
+        if (!new_leader)
+            return;
 
         this.leader = new_leader;
         this.leader.target = this.target;
@@ -126,8 +126,8 @@ class Hivemind {
             return;
         }
 
-        if (!this.leader)
-            this.assignLeader();
+        // if (!this.leader)
+        this.assignLeader();
 
         this.pos.x = this.leader.pos.x;
         this.pos.y = this.leader.pos.y;

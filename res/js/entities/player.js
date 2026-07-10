@@ -41,13 +41,12 @@ class Player extends Humanoid {
         this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
         this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
 
+        this.wand.update(dt);
+
         if (RL_IsMouseButtonDown(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
             RL_SetCursorEnabled(false);
             this.wand.cast();
         }
-
-
-        this.wand.update(dt);
     }
 
     draw() {
@@ -146,8 +145,8 @@ class Wand {
             wand_center,
             pos,
             (this.angle_offset + this.angle) * RAD2DEG,
-                               {x: this.parent.body.scale},
-                               this.parent.color
+            {x: this.parent.body.scale},
+            this.parent.current_color
         );
 
         // const hitbox = this.parent.getHitbox();
