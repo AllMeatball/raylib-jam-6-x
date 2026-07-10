@@ -87,6 +87,7 @@ globalThis.ASSET_TYPE = Object.freeze({
     TEXTURE: 1,
     SOUND: 2,
     MUSIC: 3,
+    SHADER: 4,
 });
 
 globalThis.require = require;
@@ -107,6 +108,9 @@ globalThis.LoadAsset = function(type, path, key) {
             break;
         case ASSET_TYPE.SOUND:
             asset = new RL_Sound(path);
+            break;
+        case ASSET_TYPE.SHADER:
+            asset = new RL_Shader(path);
             break;
     }
 

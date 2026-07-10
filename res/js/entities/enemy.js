@@ -1,5 +1,23 @@
 // const ENEMY_SPRITE_COUNT = 4;
 const ENEMY_SPRITE_COUNT = 1;
+const ENEMY_SHADER = new RL_Shader(null, "gfx/enemy.fs");
+
+const RANDOM_COLORS = [
+    'red',
+    'brown',
+    'chocolate',
+    'coral',
+];
+
+const ENEMY_PALETTE = {
+    red:   chroma(0xefc399),
+    green: chroma(0x483a2d),
+    blue:  chroma(0xaea8a8),
+};
+
+function getRandomColor() {
+    return RANDOM_COLORS[ getRandomInt(0, RANDOM_COLORS.length) ];
+}
 
 class Enemy extends Humanoid {
     // speed = 256;
@@ -13,7 +31,22 @@ class Enemy extends Humanoid {
     damage_cooldown = 0.15;
     damage_timer = 0;
 
-    collision_queue = [];
+    drop = undefined;
+
+    palette = {};
+
+    onDeath() {
+        if (this.drop) {
+            const center = this.body.getCenter();
+            this.drop.pos.x = this.pos.x + center.x;
+            this.drop.pos.y = this.pos.y + center.y;
+            this.drop.pos.z = this.pos.y;
+
+            ENTITIES.push(this.drop);
+        }
+
+        super.onDeath();
+    }
 
     onCollision(other) {
         // this.collision_queue.push(other);
@@ -35,12 +68,22 @@ class Enemy extends Humanoid {
 
         other.doDamage(this.damage, (Math.PI * 2.0) * Math.random() );
         this.damage_timer = this.damage_cooldown;
+        this.visual.hit_angle = 15;
     }
 
     constructor(params) {
         super(params);
 
+        this.palette.red   = ENEMY_PALETTE.red.mix(getRandomColor(), Math.random() * 0.35).gl();
+        this.palette.green = ENEMY_PALETTE.green.mix(getRandomColor(), Math.random()).desaturate(1).gl();
+        this.palette.blue  = ENEMY_PALETTE.blue.gl();
+
+        // console.log(this.color.red, this.color.blue, this.color.green);
+
         const atlas = GetAsset('texture.enemy');
+
+        if (Math.random() < 0.60)
+            this.drop = new ENT_CLASS.Dot(0, 0);
 
         this.hitbox.group = PHYS_GROUP.ENEMY;
         this.hitbox.mask = 0;
@@ -57,7 +100,9 @@ class Enemy extends Humanoid {
             }
         );
 
-        this.visual.bob_speed = 1/32;
+        // this.visual.bob_speed = 1/32;
+        this.visual.hit_angle = 0;
+
         this.hivemind = params.hivemind;
         this.target = params.target;
         this.pos.x = params.x;
@@ -66,6 +111,11 @@ class Enemy extends Humanoid {
 
     update(dt) {
         super.update(dt);
+
+        if (this.visual.hit_angle > 0) {
+            this.visual.hit_angle -= dt * 60;
+        }
+        this.visual.extra_angle = this.visual.dir_x * this.visual.hit_angle;
 
         const new_dir = new Vector2(
             this.target.pos.x - this.pos.x,
@@ -112,6 +162,16 @@ class Enemy extends Humanoid {
         // this.dir.x = new_dir.x;
         // this.dir.y = new_dir.y;
 
+    }
+
+    draw() {
+        ENEMY_SHADER.setVec3("paletteRed",   this.palette.red);
+        ENEMY_SHADER.setVec3("paletteGreen", this.palette.green);
+        ENEMY_SHADER.setVec3("paletteBlue",  this.palette.blue);
+
+        ENEMY_SHADER.apply(() => {
+            super.draw();
+        });
     }
 }
 

@@ -10,6 +10,7 @@
 
 // CLASS BINDINGS
 #include "rl/image.h"
+#include "rl/shader.h"
 #include "rl/texture.h"
 #include "rl/rendertexture.h"
 
@@ -18,7 +19,7 @@
 
 #include "rl/font.h"
 
-JSAtom RL_ATOM_X, RL_ATOM_Y;
+JSAtom RL_ATOM_X, RL_ATOM_Y, RL_ATOM_Z;
 JSAtom RL_ATOM_WIDTH, RL_ATOM_HEIGHT;
 
 JSAtom RL_ATOM_RADIUS;
@@ -47,6 +48,7 @@ struct RL_CollisonBox {
 void RL_LoadAtoms(ScriptEngine *engine) {
     RL_ATOM_X = JS_NewAtom(engine->ctx, "x");
     RL_ATOM_Y = JS_NewAtom(engine->ctx, "y");
+    RL_ATOM_Z = JS_NewAtom(engine->ctx, "z");
 
     RL_ATOM_WIDTH  = JS_NewAtom(engine->ctx, "width");
     RL_ATOM_HEIGHT = JS_NewAtom(engine->ctx, "height");
@@ -61,6 +63,8 @@ void RL_LoadAtoms(ScriptEngine *engine) {
 void RL_UnloadAtoms(ScriptEngine *engine) {
     JS_FreeAtom(engine->ctx, RL_ATOM_X);
     JS_FreeAtom(engine->ctx, RL_ATOM_Y);
+    JS_FreeAtom(engine->ctx, RL_ATOM_Z);
+
     JS_FreeAtom(engine->ctx, RL_ATOM_WIDTH);
     JS_FreeAtom(engine->ctx, RL_ATOM_HEIGHT);
     JS_FreeAtom(engine->ctx, RL_ATOM_GROUP);
@@ -106,8 +110,6 @@ Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
     return color;
 }
 
-
-// TODO: performance check using `JS_GetPropertyStr` with `JS_GetProperty` using atoms inplace of strings
 Vector2 RL_GetVector2(JSContext *ctx, JSValue vector_obj) {
     Vector2 vector = {};
 
@@ -126,6 +128,48 @@ Vector2 RL_GetVector2(JSContext *ctx, JSValue vector_obj) {
     JS_FreeValue(ctx, y);
 
     return vector;
+}
+
+Vector3 RL_GetVector3(JSContext *ctx, JSValue vector_obj) {
+    Vector3 vector = {};
+
+    JSValue x = JS_GetProperty(ctx, vector_obj, RL_ATOM_X);
+    JSValue y = JS_GetProperty(ctx, vector_obj, RL_ATOM_Y);
+    JSValue z = JS_GetProperty(ctx, vector_obj, RL_ATOM_Z);
+
+    double val_f64;
+
+    JS_ToFloat64(ctx, &val_f64, x);
+    vector.x = val_f64;
+    JS_ToFloat64(ctx, &val_f64, y);
+    vector.y = val_f64;
+    JS_ToFloat64(ctx, &val_f64, z);
+    vector.z = val_f64;
+
+    JS_FreeValue(ctx, x);
+    JS_FreeValue(ctx, y);
+    JS_FreeValue(ctx, z);
+
+    return vector;
+}
+
+void RL_GetVector3Array(JSContext *ctx, JSValue vector_obj, float *array) {
+    JSValue x = JS_GetPropertyUint32(ctx, vector_obj, 0);
+    JSValue y = JS_GetPropertyUint32(ctx, vector_obj, 1);
+    JSValue z = JS_GetPropertyUint32(ctx, vector_obj, 2);
+
+    double val_f64;
+
+    JS_ToFloat64(ctx, &val_f64, x);
+    array[0] = val_f64;
+    JS_ToFloat64(ctx, &val_f64, y);
+    array[1] = val_f64;
+    JS_ToFloat64(ctx, &val_f64, z);
+    array[2] = val_f64;
+
+    JS_FreeValue(ctx, x);
+    JS_FreeValue(ctx, y);
+    JS_FreeValue(ctx, z);
 }
 
 JSValue RL_CreateVector2(JSContext *ctx, Vector2 vector) {
@@ -625,18 +669,28 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
                 if (box1.resolve && box2.resolve) {
                     float dist = sqrtf(distance_squared);
 
+
+                    float sep_x = 1;
+                    float sep_y = 1;
+#if 0
                     if (fabsf(dist) <= 0) {
-                        dist = 10;
+                        dist = 1;
+                        // dx = 1000;
+                        // dy = 1000;
+                        //
+                        // sep_x =
+                        // dist = 128;
+                    } else {
+                        sep_x = (dx) / dist;
+                        sep_y = (dy) / dist;
                     }
+#else
+                    if (fabsf(dist) <= 0)
+                        dist = 1;
 
-                    float sep_x = (dx) / dist;
-                    float sep_y = (dy) / dist;
-
-                    // result1.x =  sep_x * (dx * 0.5);
-                    // result1.y =  sep_y * (dy * 0.5);
-                    //
-                    // result2.x = -sep_x * (dx * 0.5);
-                    // result2.y = -sep_y * (dy * 0.5);
+                    sep_x = (dx) / dist;
+                    sep_y = (dy) / dist;
+#endif
 
                     result2.x = (box1.position.x - sep_x * radius_sum - box2.position.x) * 0.4;
                     result2.y = (box1.position.y - sep_y * radius_sum - box2.position.y) * 0.4;
@@ -750,6 +804,7 @@ void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Sound = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_RenderTexture);
+    SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Shader);
 
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Image);
     SCRIPTENGINE_DEFINE_CLASS2(engine, RL_MusicStream);
