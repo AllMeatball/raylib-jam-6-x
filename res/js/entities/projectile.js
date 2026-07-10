@@ -10,7 +10,7 @@ class Projectile {
 
     max_afterimages = 10;
     afterimages = [];
-    base_color = chroma('coral');
+    // base_color = chroma('coral');
 
     collidable = true;
 
@@ -21,10 +21,10 @@ class Projectile {
         if (other === this.creator)
             return;
 
+
         if (!this.delete)
             other.doDamage(this.damage, this.angle);
-
-        this.delete = true;
+            this.delete = true;
     }
 
     constructor(creator, x, y, angle, speed) {
@@ -32,6 +32,7 @@ class Projectile {
         this.pos.y = y;
 
         this.texture = GetAsset('texture.projectile');
+        this.base_color = chroma.temperature( (speed / 512) * 2000).mix('red', 0.25).saturate();
         this.color = this.base_color.darken(Math.sin(TIMER * 8.0)).rgb();
 
         this.angle = angle;

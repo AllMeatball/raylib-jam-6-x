@@ -429,6 +429,21 @@ JSValue RL_IsMouseButtonPressed_JSAPI(JSContext *ctx, JSValueConst this_val, int
     return JS_NewBool(ctx, IsMouseButtonPressed(button));
 }
 
+
+JSValue RL_IsMouseButtonDown_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    int32_t button;
+    if (argc < 1) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "button not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    JS_ToInt32(ctx, &button, argv[0]);
+    return JS_NewBool(ctx, IsMouseButtonDown(button));
+}
+
 JSValue RL_IsKeyPressed_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     int32_t key;
     if (argc < 1) {
@@ -834,6 +849,8 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
     ScriptEngine_RegisterFunc(engine, RL_GetMousePosition);
     ScriptEngine_RegisterFunc(engine, RL_GetMouseDelta);
     ScriptEngine_RegisterFunc(engine, RL_IsMouseButtonPressed);
+    ScriptEngine_RegisterFunc(engine, RL_IsMouseButtonDown);
+
     ScriptEngine_RegisterFunc(engine, RL_IsKeyPressed);
 
     ScriptEngine_RegisterFunc(engine, RL_IsKeyUp);

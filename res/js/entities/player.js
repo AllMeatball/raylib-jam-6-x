@@ -1,12 +1,16 @@
 const SFX_MAGIK = new RL_Sound("sfx/magik.ogg");
+SFX_MAGIK.setVolume(0.5);
 
 class Player extends Humanoid {
     onDeath() {
-        super.onDeath();
+        const result = super.onDeath();
         STATES.current.doGameover();
+
+        return result;
     }
 
     constructor(params) {
+        params.health = 125;
         super(params);
 
         this.hitbox.group = PHYS_GROUP.PLAYER;
@@ -37,7 +41,7 @@ class Player extends Humanoid {
         this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
         this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
 
-        if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
+        if (RL_IsMouseButtonDown(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
             RL_SetCursorEnabled(false);
             this.wand.cast();
         }
@@ -60,6 +64,8 @@ class Player extends Humanoid {
 class Wand {
     pos = new Vector2();
     cursor_pos = new Vector2();
+    cast_timer = 0;
+    cast_delay = 0.25;
 
     angle = 0;
     angle_offset = Math.PI/2;
@@ -87,6 +93,9 @@ class Wand {
     }
 
     update(dt) {
+        if (this.cast_timer > 0)
+            this.cast_timer -= dt;
+
         const mouse_delta = RL_GetMouseDelta();
 
         mouse_delta.x *= 0.45;
@@ -105,7 +114,6 @@ class Wand {
         ) % (Math.PI*2);
 
         const pos = this.getAbsolutePos();
-        const hitbox = this.parent.getHitbox();
 
         // const wand_above_player = (this.pos.y) < (this.parent.hitbox.y + 48);
         const wand_above_player = (pos.y) < (this.y_sensor + 48);
@@ -113,11 +121,16 @@ class Wand {
     }
 
     cast() {
+        if (this.cast_timer > 0)
+            return;
+
         SFX_MAGIK.play();
         SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
 
         const pos = this.getAbsolutePos();
         globalThis.ENTITIES.push(new ENT_CLASS.Projectile(this.parent, pos.x, pos.y, this.angle, 512));
+
+        this.cast_timer = this.cast_delay;
     }
 
     draw() {
