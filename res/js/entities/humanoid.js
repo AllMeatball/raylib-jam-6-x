@@ -54,8 +54,8 @@ class Humanoid {
         }
 
         PlayTempSound('sfx.hit', (sound) => {
-            sound.setVolume(0.25);
-            sound.setPitch(1.45 - Math.random() * 0.25)
+            sound.setVolume(0.40);
+            sound.setPitch(0.85 - Math.random() * 0.25)
             sound.play();
         });
 

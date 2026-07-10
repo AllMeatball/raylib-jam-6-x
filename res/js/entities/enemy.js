@@ -26,8 +26,6 @@ class Enemy extends Humanoid {
     // speed = 256;
     speed = 32;
 
-    push_radius = 32;
-
     // smooth_velocity = false;
 
     damage = 10;
@@ -69,9 +67,12 @@ class Enemy extends Humanoid {
         if ( !(other instanceof ENT_CLASS.Player) )
             return;
 
-        other.doDamage(this.damage, (Math.PI * 2.0) * Math.random() );
+        const it_hurt = other.doDamage(this.damage, (Math.PI * 2.0) * Math.random() );
         this.damage_timer = this.damage_cooldown;
-        this.visual.hit_angle = 15;
+
+        if (it_hurt) {
+            this.visual.hit_angle = 15;
+        }
     }
 
     constructor(params) {
@@ -108,9 +109,26 @@ class Enemy extends Humanoid {
         this.visual.hit_angle = 0;
 
         this.hivemind = params.hivemind;
+        this.health = this.hivemind.wave.health;
+        this.speed = this.hivemind.wave.speed;
+
         this.target = params.target;
         this.pos.x = params.x;
         this.pos.y = params.y;
+    }
+
+    getTargetLine(target = this.target) {
+        return new Vector2(
+            target.pos.x - this.pos.x,
+            target.pos.y - this.pos.y
+        );
+    }
+
+    getReverseTargetLine(target = this.target) {
+        return new Vector2(
+            this.pos.x - target.pos.x,
+            this.pos.y - target.pos.y
+        );
     }
 
     update(dt) {
@@ -121,12 +139,7 @@ class Enemy extends Humanoid {
         }
         this.visual.extra_angle = this.visual.dir_x * this.visual.hit_angle;
 
-        const new_dir = new Vector2(
-            this.target.pos.x - this.pos.x,
-            this.target.pos.y - this.pos.y
-        );
-        const dist = new_dir.magnitude();
-
+        const new_dir = this.getTargetLine();
         new_dir.normalize();
 
         this.dir.x = new_dir.x;

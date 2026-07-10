@@ -1,10 +1,8 @@
 const MainState = {
-    hivemind: new Hivemind(),
     health_text_color: chroma(0xff9292).rgba(),
 
     enter() {
         ENTITIES.length = 0;
-        this.hivemind.mob.length = 0;
 
         this.gameover_timer = 0;
         this.gameover_timer_target = Infinity;
@@ -12,7 +10,18 @@ const MainState = {
         this.timer = 0;
         this.gameover = false;
 
-        this.PLAYER = new ENT_CLASS.Player({x: 0, y: 0});
+        this.PLAYER = new ENT_CLASS.Player({
+            x: 0,
+            y: 0
+        });
+
+        const player_center = this.PLAYER.body.getCenter();
+        this.PLAYER.pos.x = SCREEN_SIZE * 0.5 - player_center.x;
+        this.PLAYER.pos.y = SCREEN_SIZE * 0.5 - player_center.y;
+
+        // this.PLAYER.b.getCenter();
+
+        this.hivemind = new Hivemind();
         this.hivemind.target = this.PLAYER;
 
         ENTITIES.push(this.PLAYER);
@@ -82,7 +91,7 @@ const MainState = {
         }
 
         CollisionSystem.update();
-        this.hivemind.update();
+        this.hivemind.update(dt);
     },
 
     gameover_color: [255,0,0],
@@ -104,6 +113,7 @@ const MainState = {
             RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
 
         RL_DrawTextEx(MAIN_FONT, `Time: ${ secondsToString(this.timer) }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
+        RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 64}, 64, 4, [255,255,255]);
 
         if (this.gameover) {
             RL_DrawRectangle({
