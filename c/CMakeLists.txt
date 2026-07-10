@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 if (NOT DEFINED GAME_NAME)
-    set(GAME_NAME "Hexes")
+    set(GAME_NAME "Hexzard")
 endif ()
 project("${GAME_NAME}" C)
 
@@ -50,6 +50,7 @@ if (EMSCRIPTEN)
     # add_link_options()
 endif ()
 
+add_subdirectory("box2d")
 add_subdirectory("quickjs")
 add_subdirectory("physfs")
 add_subdirectory("raylib")
@@ -61,4 +62,4 @@ if (EMSCRIPTEN)
 endif ()
 
 target_link_libraries("${GAME_NAME}" m) # math library
-target_link_libraries("${GAME_NAME}" quickjs raylib physfs-static)
+target_link_libraries("${GAME_NAME}" box2d quickjs raylib physfs-static)
