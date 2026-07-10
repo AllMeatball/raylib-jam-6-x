@@ -1,5 +1,6 @@
 class Body {
     scale = 0.15;
+    shadow_scale = 1.0;
     texture = undefined;
     shadow_texture = undefined;
 
@@ -61,10 +62,10 @@ class Body {
             height: this.shadow_texture.height,
         };
 
-        const shadow_width  = this.rect.width * this.scale;
+        const shadow_width  = this.rect.width * this.scale * this.shadow_scale;
         const shadow_height = (this.rect.height * this.scale * 0.25);
         const dest = {
-            x: pos.x,
+            x: pos.x + (this.rect.width * this.scale * 0.5) - shadow_width * 0.5,
             y: pos.y + (this.rect.height * this.scale) - shadow_height + 16,
             width:  shadow_width,
             height: shadow_height,

@@ -4,6 +4,9 @@ class Humanoid {
     health = 100;
 
     color = [255,255,255];
+    color_target = chroma('orangered').rgb();
+
+    color_blend = 0;
 
     hitbox = {
         x: 0,
@@ -35,11 +38,21 @@ class Humanoid {
     doDamage(damage, angle) {
         this.health -= damage;
 
+        if (this.health < 0)
+            this.health = 0;
+
         if (angle) {
             const force = damage * 42;
             this.velocity.x += Math.cos(angle) * force;
             this.velocity.y += Math.sin(angle) * force;
         }
+
+        PlayTempSound('sfx.hit', (sound) => {
+            sound.setVolume(0.25);
+            sound.setPitch(1.45 - Math.random() * 0.25)
+            sound.play();
+        });
+        this.color_blend = 1.0;
     }
 
     onDeath() {
@@ -73,7 +86,10 @@ class Humanoid {
     }
 
     update(dt) {
-        if (this.health < 0) {
+        if (this.color_blend > 0)
+            this.color_blend -= dt;
+
+        if (this.health <= 0) {
             this.onDeath();
             return;
         }
@@ -122,7 +138,7 @@ class Humanoid {
 
         const angle = (Math.cos(this.visual.timer * (speed * 1.125)) + this.visual.extra_angle) * this.visual.anim_scale;
 
-        this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.color, this.visual.dir_x < 0);
+        this.body.draw(this.pos, pos_offset, angle, {x: 1}, chroma(this.color).mix(this.color_target, this.color_blend).rgb(), this.visual.dir_x < 0);
 
         if (GLOBAL_FLAGS.includes("boxes")) {
             const hitbox = this.getHitbox();

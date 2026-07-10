@@ -1,5 +1,6 @@
 const MainState = {
     hivemind: new Hivemind(),
+    health_text_color: chroma(0xff9292).rgba(),
 
     enter() {
         ENTITIES.length = 0;
@@ -88,12 +89,19 @@ const MainState = {
     draw() {
         RL_ClearBackground(BG_COLOR);
 
-        for (ent of ENTITIES)
+        const draw_order = ENTITIES;
+        draw_order.sort((ent1, ent2) => {
+            const z1 = (ent1.pos.z || ent1.pos.y);
+            const z2 = (ent2.pos.z || ent2.pos.y);
+            return z1 - z2;
+        });
+        for (ent of draw_order)
             ent.draw();
 
         if (GLOBAL_FLAGS.includes('debug'))
-            RL_DrawTextEx(MAIN_FONT, `#ENTS: ${ENTITIES.length}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, [255,0,0]);
-
+            RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}, #ENTS: ${ENTITIES.length}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
+        else
+            RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
 
         RL_DrawTextEx(MAIN_FONT, `Time: ${ secondsToString(this.timer) }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
 

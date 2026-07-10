@@ -6,6 +6,9 @@ const RANDOM_COLORS = [
     'red',
     'brown',
     'chocolate',
+    'goldenrod',
+    'lavenderblush',
+    'lawngreen',
     'coral',
 ];
 
@@ -75,7 +78,7 @@ class Enemy extends Humanoid {
         super(params);
 
         this.palette.red   = ENEMY_PALETTE.red.mix(getRandomColor(), Math.random() * 0.35).gl();
-        this.palette.green = ENEMY_PALETTE.green.mix(getRandomColor(), Math.random()).desaturate(1).gl();
+        this.palette.green = ENEMY_PALETTE.green.mix(getRandomColor(), Math.random()).desaturate(0.95).gl();
         this.palette.blue  = ENEMY_PALETTE.blue.gl();
 
         // console.log(this.color.red, this.color.blue, this.color.green);
@@ -99,6 +102,7 @@ class Enemy extends Humanoid {
                 height: atlas.width
             }
         );
+        this.body.shadow_scale = 0.75;
 
         // this.visual.bob_speed = 1/32;
         this.visual.hit_angle = 0;

@@ -1,5 +1,62 @@
 const SFX_MAGIK = new RL_Sound("sfx/magik.ogg");
 
+class Player extends Humanoid {
+    onDeath() {
+        super.onDeath();
+        STATES.current.doGameover();
+    }
+
+    constructor(params) {
+        super(params);
+
+        this.hitbox.group = PHYS_GROUP.PLAYER;
+
+        this.setupBody(
+            GetAsset('texture.player'),
+            GetAsset('texture.shadow')
+        );
+
+        this.wand = new Wand(this);
+    }
+
+    update(dt) {
+        this.dir.x = 0;
+        this.dir.y = 0;
+
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_A))
+            this.dir.x -= 1;
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_D))
+            this.dir.x += 1;
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_W))
+            this.dir.y -= 1;
+        if (RL_IsKeyDown(RL_KeyboardKey.KEY_S))
+            this.dir.y += 1;
+
+        super.update(dt);
+
+        this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
+        this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
+
+        if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
+            RL_SetCursorEnabled(false);
+            this.wand.cast();
+        }
+
+
+        this.wand.update(dt);
+    }
+
+    draw() {
+        if (this.wand.backdraw)
+            this.wand.draw();
+
+        super.draw();
+
+        if (!this.wand.backdraw)
+            this.wand.draw();
+    }
+}
+
 class Wand {
     pos = new Vector2();
     cursor_pos = new Vector2();
@@ -76,68 +133,11 @@ class Wand {
             wand_center,
             pos,
             (this.angle_offset + this.angle) * RAD2DEG,
-            {x: this.parent.body.scale},
-            this.parent.color
+                               {x: this.parent.body.scale},
+                               this.parent.color
         );
 
         // const hitbox = this.parent.getHitbox();
-    }
-}
-
-class Player extends Humanoid {
-    onDeath() {
-        super.onDeath();
-        STATES.current.doGameover();
-    }
-
-    constructor(params) {
-        super(params);
-
-        this.hitbox.group = PHYS_GROUP.PLAYER;
-
-        this.setupBody(
-            GetAsset('texture.player'),
-            GetAsset('texture.shadow')
-        );
-
-        this.wand = new Wand(this);
-    }
-
-    update(dt) {
-        this.dir.x = 0;
-        this.dir.y = 0;
-
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_A))
-            this.dir.x -= 1;
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_D))
-            this.dir.x += 1;
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_W))
-            this.dir.y -= 1;
-        if (RL_IsKeyDown(RL_KeyboardKey.KEY_S))
-            this.dir.y += 1;
-
-        super.update(dt);
-
-        this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
-        this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
-
-        if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
-            RL_SetCursorEnabled(false);
-            this.wand.cast();
-        }
-
-
-        this.wand.update(dt);
-    }
-
-    draw() {
-        if (this.wand.backdraw)
-            this.wand.draw();
-
-        super.draw();
-
-        if (!this.wand.backdraw)
-            this.wand.draw();
     }
 }
 

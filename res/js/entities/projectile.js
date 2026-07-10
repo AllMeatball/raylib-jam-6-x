@@ -8,7 +8,7 @@ class Projectile {
     decay_target = 0.8;
     decay = 0;
 
-    max_afterimages = 6;
+    max_afterimages = 10;
     afterimages = [];
     base_color = chroma('coral');
 
@@ -21,13 +21,16 @@ class Projectile {
         if (other === this.creator)
             return;
 
-        other.doDamage(this.damage, this.angle);
+        if (!this.delete)
+            other.doDamage(this.damage, this.angle);
+
         this.delete = true;
     }
 
     constructor(creator, x, y, angle, speed) {
         this.pos.x = x;
         this.pos.y = y;
+
         this.texture = GetAsset('texture.projectile');
         this.color = this.base_color.darken(Math.sin(TIMER * 8.0)).rgb();
 
