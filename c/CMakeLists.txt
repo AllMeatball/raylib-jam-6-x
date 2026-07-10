@@ -67,3 +67,8 @@ endif ()
 
 target_link_libraries("${GAME_NAME}" m) # math library
 target_link_libraries("${GAME_NAME}" quickjs raylib physfs-static)
+
+
+if (WIN32)
+    target_link_options("${GAME_NAME}" PRIVATE "LINKER:-static")
+endif ()
