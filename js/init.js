@@ -93,6 +93,8 @@ globalThis.ASSET_TYPE = Object.freeze({
 globalThis.require = require;
 
 const _asset_list = {};
+let _tmp_sound_queue = [];
+
 globalThis.LoadAsset = function(type, path, key) {
     let asset = undefined;
 
@@ -124,11 +126,25 @@ globalThis.LoadAsset = function(type, path, key) {
     return asset;
 }
 
+globalThis.PlayTempSound = function(key, func = (sound) => sound.play()) {
+    const asset = _asset_list[key];
+
+    if ( !(asset instanceof RL_Sound) )
+        return;
+
+    const tmp_sound = asset.makeAlias();
+    func(tmp_sound);
+
+    _tmp_sound_queue.push(tmp_sound);
+
+    return tmp_sound;
+}
+
 globalThis.GetAsset = function(key) {
     return _asset_list[key];
 }
 
-globalThis.MusicUpdate = function() {
+globalThis.MusicUpdate = function(dt) {
     for (const key in _asset_list) {
         const asset = _asset_list[key];
 
@@ -136,6 +152,17 @@ globalThis.MusicUpdate = function() {
             continue;
 
         asset.update();
+    }
+
+    for (let i = _tmp_sound_queue.length - 1; i >= 0; i--) {
+        const sound = _tmp_sound_queue[i];
+        // console.log(_tmp_sound_queue.length);
+
+        if (!sound)
+            continue;
+
+        if (!sound.isPlaying())
+            _tmp_sound_queue = _tmp_sound_queue.splice(i);
     }
 }
 

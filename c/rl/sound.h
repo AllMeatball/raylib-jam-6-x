@@ -12,8 +12,11 @@ JSValue CLASSFUNC_RL_Sound_Stop(JSContext *ctx, JSValueConst this_val, int argc,
 JSValue CLASSFUNC_RL_Sound_Pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 JSValue CLASSFUNC_RL_Sound_Resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 JSValue CLASSFUNC_RL_Sound_SetPitch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
+JSValue CLASSFUNC_RL_Sound_SetVolume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
+
 JSValue CLASSFUNC_RL_Sound_GetDuration(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 JSValue CLASSFUNC_RL_Sound_MakeAlias(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
+JSValue CLASSFUNC_RL_Sound_IsPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 
 SCRIPTENGINE_DECLARE_CLASS(RL_Sound, CLASSFINAL_RL_Sound);
 
@@ -31,6 +34,9 @@ static const JSCFunctionListEntry CLASSFUNCS_RL_Sound[] = {
 
     JS_CFUNC_DEF("makeAlias", 0, CLASSFUNC_RL_Sound_MakeAlias),
     JS_CFUNC_DEF("setPitch", 0, CLASSFUNC_RL_Sound_SetPitch),
+    JS_CFUNC_DEF("setVolume", 0, CLASSFUNC_RL_Sound_SetVolume),
+
     JS_CFUNC_DEF("getDuration", 0, CLASSFUNC_RL_Sound_GetDuration),
+    JS_CFUNC_DEF("isPlaying", 0, CLASSFUNC_RL_Sound_IsPlaying),
 };
 

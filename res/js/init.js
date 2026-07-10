@@ -99,7 +99,7 @@ function ENGINE_Update(dt) {
             ENGINE_Restart();
     }
 
-    MusicUpdate();
+    MusicUpdate(dt);
 
     globalThis.TIMER += dt;
     STATES.current.update(dt);

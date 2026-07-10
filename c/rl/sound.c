@@ -83,6 +83,25 @@ JSValue CLASSFUNC_RL_Sound_SetPitch(JSContext *ctx, JSValueConst this_val, int a
     return JS_UNDEFINED;
 }
 
+JSValue CLASSFUNC_RL_Sound_SetVolume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    double volume = 0;
+    Sound *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    if (!sound)
+        return JS_EXCEPTION;
+
+    if (argc < 1) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "volume not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    JS_ToFloat64(ctx, &volume, argv[0]);
+    SetSoundVolume(*sound, volume);
+    return JS_UNDEFINED;
+}
+
 
 JSValue CLASSFUNC_RL_Sound_Stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
@@ -117,6 +136,14 @@ JSValue CLASSFUNC_RL_Sound_GetDuration(JSContext *ctx, JSValueConst this_val, in
         return JS_EXCEPTION;
 
     return JS_NewFloat64(ctx, sound->duration);
+}
+
+JSValue CLASSFUNC_RL_Sound_IsPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    struct RL_SoundWrap *sound = JS_GetOpaque2(ctx, this_val, CLASSID_RL_Sound);
+    if (!sound)
+        return JS_EXCEPTION;
+
+    return JS_NewBool(ctx, IsSoundPlaying(sound->sound));
 }
 
 JSValue CLASSFUNC_RL_Sound_MakeAlias(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

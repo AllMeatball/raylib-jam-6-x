@@ -102,7 +102,7 @@ JSValue CLASSFUNC_RL_Shader_SetVec3(JSContext *ctx, JSValueConst this_val, int a
     RL_GetVector3Array(ctx, argv[1], value);
 
     int location = GetShaderLocation(*shader, uniform);
-    printf("%d: %f, %f, %f\n", location, value[0], value[1], value[2]);
+    // printf("%d: %f, %f, %f\n", location, value[0], value[1], value[2]);
 
     SetShaderValue(*shader, location, &value, SHADER_UNIFORM_VEC3);
     return JS_UNDEFINED;
