@@ -68,6 +68,7 @@ class Hivemind {
         this.wave.count += 5;
         this.wave.speed *= 1.15;
         this.wave.health *= 1.05;
+        this.wave.damage *= 1.025;
     }
 
 

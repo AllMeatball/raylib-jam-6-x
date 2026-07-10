@@ -144,6 +144,29 @@ globalThis.GetAsset = function(key) {
     return _asset_list[key];
 }
 
+globalThis.PauseAllSound = function() {
+    for (const key in _asset_list) {
+        const asset = _asset_list[key];
+
+        if ( !(asset instanceof RL_MusicStream || asset instanceof RL_Sound) )
+            continue;
+
+
+        asset.pause();
+    }
+}
+
+globalThis.ResumeAllSound = function() {
+    for (const key in _asset_list) {
+        const asset = _asset_list[key];
+
+        if ( !(asset instanceof RL_MusicStream || asset instanceof RL_Sound) )
+            continue;
+
+        asset.resume();
+    }
+}
+
 globalThis.MusicUpdate = function(dt) {
     for (const key in _asset_list) {
         const asset = _asset_list[key];

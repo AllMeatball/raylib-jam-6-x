@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
     ChangeDirectory("res");
 
     InitAudioDevice();
-    SetMasterVolume(0.35);
+    // SetMasterVolume(0.5);
 
     script_data = LoadFileText("js/init.js");
     if (!script_data)

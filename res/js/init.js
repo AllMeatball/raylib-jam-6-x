@@ -12,6 +12,7 @@ globalThis.Hivemind = require('./hivemind.js');
 globalThis.PHYS_GROUP = Object.freeze({
     PLAYER: 1,
     ENEMY:  2,
+    PICKUP: 4,
 });
 
 globalThis.SCREEN_SIZE = 720;
@@ -63,11 +64,12 @@ const Body = require("./body.js");
 const Humanoid = require("./entities/humanoid.js");
 const PatternSystem = require("./patterns.js");
 
-
 const ENT_CLASS = {
+    TempText: require('./entities/temptext.js'),
     Projectile: require("./entities/projectile.js"),
     Player: require("./entities/player.js"),
     Enemy: require("./entities/enemy.js"),
+    SpellDrop: require("./entities/spelldrop.js"),
     Dot:  require("./entities/dot.js"),
 };
 

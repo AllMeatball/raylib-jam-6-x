@@ -1,5 +1,6 @@
 const MainState = {
     health_text_color: chroma(0xff9292).rgba(),
+    paused: false,
 
     enter() {
         ENTITIES.length = 0;
@@ -56,9 +57,32 @@ const MainState = {
             this.hivemind.createLeader(this.PLAYER);
         if (RL_IsKeyPressed(RL_KeyboardKey.KEY_P))
             this.hivemind.spawnWave(20);
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_T)) {
+            const mouse_pos = RL_GetMousePosition();
+            const text = new ENT_CLASS.TempText({
+                x: mouse_pos.x,
+                y: mouse_pos.y,
+                start_time: -0.5,
+                time: 0.25
+            });
+
+            ENTITIES.push(text);
+        }
     },
 
     update(dt) {
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_ENTER)) {
+            this.paused = !this.paused;
+
+            if (this.paused)
+                PauseAllSound();
+            else
+                ResumeAllSound();
+        }
+
+        if (this.paused)
+            return;
+
         if (this.gameover) {
             this.gameover_timer += dt;
             if (this.song_pitch > 0.45) {
@@ -108,12 +132,23 @@ const MainState = {
             ent.draw();
 
         if (GLOBAL_FLAGS.includes('debug'))
-            RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}, #ENTS: ${ENTITIES.length}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
+            RL_DrawTextEx(MAIN_FONT, `Health: ${Math.round(this.PLAYER.health)}, #ENTS: ${ENTITIES.length}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
         else
-            RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
+            RL_DrawTextEx(MAIN_FONT, `Health: ${Math.round(this.PLAYER.health)}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
 
         RL_DrawTextEx(MAIN_FONT, `Time: ${ secondsToString(this.timer) }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
         RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 64}, 64, 4, [255,255,255]);
+
+        if (this.paused) {
+            RL_DrawRectangle({
+                x: 0,
+                y: 0,
+                width:  SCREEN_SIZE,
+                height: SCREEN_SIZE
+            }, [0,0,0, 0.5]);
+            RL_DrawCenterText(TITLE_FONT, "PAUSED", 0.5, 0.5, 128, [255,255,255])
+            return;
+        }
 
         if (this.gameover) {
             RL_DrawRectangle({

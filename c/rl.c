@@ -815,6 +815,27 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
 }
 #endif
 
+JSValue RL_SetMasterVolume_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    double volume;
+    if (argc < 1) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "volume not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    JS_ToFloat64(ctx, &volume, argv[0]);
+
+    SetMasterVolume(volume);
+    return JS_UNDEFINED;
+}
+
+
+JSValue RL_GetMasterVolume_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    return JS_NewFloat64(ctx, GetMasterVolume());
+}
+
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Sound = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
@@ -858,6 +879,8 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
 
     ScriptEngine_RegisterFunc(engine, RL_DrawTextEx);
     ScriptEngine_RegisterFunc(engine, RL_MeasureTextEx);
+    ScriptEngine_RegisterFunc(engine, RL_SetMasterVolume);
+    ScriptEngine_RegisterFunc(engine, RL_GetMasterVolume);
 
 
     ScriptEngine_RegisterFunc(engine, RL_DrawRectangle);

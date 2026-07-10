@@ -44,6 +44,12 @@ JSValue CLASSCTOR_RL_Font(JSContext *ctx, JSValueConst new_target, int argc, JSV
         return JS_EXCEPTION;
 
     *font = LoadFontEx(path, font_size, 0, 0);
+
+    // if (!IsFontValid(*font)) {
+    GenTextureMipmaps(&font->texture);
+    SetTextureFilter(font->texture, TEXTURE_FILTER_BILINEAR);
+    // }
+
     JS_FreeCString(ctx, path);
 
     return obj;

@@ -15,7 +15,7 @@ class Projectile {
     collidable = true;
 
     onCollision(other) {
-        if (other instanceof Projectile)
+        if (other instanceof Projectile || other instanceof ENT_CLASS.SpellDrop)
             return;
 
         if (other === this.creator)
@@ -46,7 +46,7 @@ class Projectile {
             resolve: false,
             // width:  this.radius * 2.0,
             // height: this.radius * 2.0,
-            mask:   PHYS_GROUP.PLAYER,
+            mask:   PHYS_GROUP.PLAYER | PHYS_GROUP.PICKUP,
         };
 
         this.decay = -0.5;

@@ -50,17 +50,6 @@ class Enemy extends Humanoid {
     }
 
     onCollision(other) {
-        // this.collision_queue.push(other);
-        // const other = this.collision_queue.pop();
-        // console.log(other);
-//         if ( other instanceof ENT_CLASS.Enemy ) {
-//             // console.log('serperat')
-//             other.x += (other.pos.x - this.pos.x);
-//             other.y += (other.pos.y - this.pos.y);
-//             // console.log('aaaaaa')
-//
-//             return;
-//         }
         if (this.damage_timer > 0)
             return;
 
@@ -70,9 +59,9 @@ class Enemy extends Humanoid {
         const it_hurt = other.doDamage(this.damage, (Math.PI * 2.0) * Math.random() );
         this.damage_timer = this.damage_cooldown;
 
-        if (it_hurt) {
+        if (it_hurt)
             this.visual.hit_angle = 15;
-        }
+
     }
 
     constructor(params) {
@@ -87,7 +76,7 @@ class Enemy extends Humanoid {
         const atlas = GetAsset('texture.enemy');
 
         if (Math.random() < 0.60)
-            this.drop = new ENT_CLASS.Dot(0, 0);
+            this.drop = new ENT_CLASS.SpellDrop({x: 0, y: 0});
 
         this.hitbox.group = PHYS_GROUP.ENEMY;
         this.hitbox.mask = 0;

@@ -1,6 +1,3 @@
-const SFX_MAGIK = new RL_Sound("sfx/magik.ogg");
-SFX_MAGIK.setVolume(0.5);
-
 class Player extends Humanoid {
     onDeath() {
         const result = super.onDeath();
@@ -78,6 +75,7 @@ class Wand {
 
         this.pattern_sys = new PatternSystem(this);
 
+        this.SFX_MAGIK = GetAsset('sfx.magik');
         this.texture = GetAsset('texture.player.wand');
     }
 
@@ -123,8 +121,8 @@ class Wand {
         if (this.cast_timer > 0)
             return;
 
-        SFX_MAGIK.play();
-        SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
+        this.SFX_MAGIK.play();
+        this.SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
 
         const pos = this.getAbsolutePos();
         globalThis.ENTITIES.push(new ENT_CLASS.Projectile(this.parent, pos.x, pos.y, this.angle, 512));

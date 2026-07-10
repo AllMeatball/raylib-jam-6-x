@@ -39,4 +39,5 @@ LoadAsset(ASSET_TYPE.MUSIC, "music/yes-sire.ogg", "music.title");
 LoadAsset(ASSET_TYPE.SOUND, "sfx/oh-no.wav", "sfx.gameover");
 LoadAsset(ASSET_TYPE.SOUND, "sfx/hit.wav", "sfx.hit");
 LoadAsset(ASSET_TYPE.SOUND, "sfx/wave.ogg", "sfx.wave");
-
+const sfx_magik = LoadAsset(ASSET_TYPE.SOUND, "sfx/magik.ogg", "sfx.magik");
+sfx_magik.setVolume(0.5);
