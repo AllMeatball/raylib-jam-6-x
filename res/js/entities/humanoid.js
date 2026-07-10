@@ -8,6 +8,9 @@ class Humanoid {
 
     color_blend = 0;
 
+    iframes = 0;
+    iframes_max = 0.25;
+
     hitbox = {
         x: 0,
         y: 32,
@@ -36,6 +39,9 @@ class Humanoid {
     collidable = true;
 
     doDamage(damage, angle) {
+        if (this.iframes > 0)
+            return false;
+
         this.health -= damage;
 
         if (this.health < 0)
@@ -52,7 +58,11 @@ class Humanoid {
             sound.setPitch(1.45 - Math.random() * 0.25)
             sound.play();
         });
+
         this.color_blend = 1.0;
+        this.iframes = this.iframes_max;
+
+        return true;
     }
 
     onDeath() {
@@ -64,6 +74,9 @@ class Humanoid {
     constructor(params) {
         this.pos.x = params.x;
         this.pos.y = params.y;
+
+        if (params.health)
+            this.health = params.health;
     }
 
     setupBody(texture, shadow_texture, rect) {
@@ -86,6 +99,9 @@ class Humanoid {
     }
 
     update(dt) {
+        if (this.iframes > 0)
+            this.iframes -= dt;
+
         if (this.color_blend > 0)
             this.color_blend -= dt;
 
