@@ -12,6 +12,8 @@ class Wand {
 
     constructor(parent) {
         this.parent = parent;
+        this.y_sensor = 355 * this.parent.body.size;
+
         this.pattern_sys = new PatternSystem(this);
 
         this.texture = GetAsset('texture.player.wand');
@@ -49,7 +51,7 @@ class Wand {
         const hitbox = this.parent.getHitbox();
 
         // const wand_above_player = (this.pos.y) < (this.parent.hitbox.y + 48);
-        const wand_above_player = (pos.y) < (hitbox.y + 48);
+        const wand_above_player = (pos.y) < (this.y_sensor + 48);
         this.backdraw = MirrorRange(this.angle, 0.85) || wand_above_player;
     }
 
@@ -67,6 +69,7 @@ class Wand {
             y: (this.texture.height * this.parent.body.scale) * 0.5,
         };
 
+
         const pos = this.getAbsolutePos();
         RL_DrawTextureAtOrigin(
             this.texture,
@@ -82,8 +85,6 @@ class Wand {
 }
 
 class Player extends Humanoid {
-    wand = new Wand(this);
-
     onDeath() {
         super.onDeath();
         STATES.current.doGameover();
@@ -92,12 +93,14 @@ class Player extends Humanoid {
     constructor(params) {
         super(params);
 
-        this.hitbox.group = 1;
+        this.hitbox.group = PHYS_GROUP.PLAYER;
 
         this.setupBody(
             GetAsset('texture.player'),
             GetAsset('texture.shadow')
         );
+
+        this.wand = new Wand(this);
     }
 
     update(dt) {
@@ -115,10 +118,14 @@ class Player extends Humanoid {
 
         super.update(dt);
 
+        this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
+        this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
+
         if (RL_IsMouseButtonPressed(RL_MouseButton.MOUSE_BUTTON_LEFT)) {
             RL_SetCursorEnabled(false);
             this.wand.cast();
         }
+
 
         this.wand.update(dt);
     }

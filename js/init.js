@@ -144,8 +144,10 @@ globalThis.getRandomInt = function(min, max) {
 }
 
 globalThis.secondsToString = function(seconds) {
-    if (seconds >= 60)
-        return Math.floor(seconds / 60).toString();
+    if (seconds >= 60) {
+        const minutes = Math.floor(seconds / 60);
+        return std.sprintf("%d:%02d", minutes, seconds - (minutes * 60));
+    }
 
     return std.sprintf("%.2fs", seconds);
 }
@@ -177,6 +179,10 @@ class Vector2 {
         this.y += vec2.y;
     }
 
+    addVector2Scalar(vec2, scalar) {
+        this.x += vec2.x * scalar;
+        this.y += vec2.y * scalar;
+    }
 
     copy() {
         return new Vector2(this.x, this.y);

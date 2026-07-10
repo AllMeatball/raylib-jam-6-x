@@ -21,6 +21,8 @@ set(APP_SRC
     script.c
     fs.c
 
+    # box2d_wrap.c
+
     rl.c
     rl/font.c
     rl/image.c
@@ -40,7 +42,6 @@ if (EMSCRIPTEN)
     # ${CMAKE_SOURCE_DIR}/../res
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
-    # target_compile_options(my_target PRIVATE "-O3")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1 -v --shell-file \"${CMAKE_SOURCE_DIR}/shell.html\" -sINITIAL_MEMORY=268435456")
     set(CMAKE_EXECUTABLE_SUFFIX ".html") # This line is used to set your executable to build with the emscripten html template so that you can directly open it.
     web_embed_file("mounts")
@@ -48,9 +49,11 @@ if (EMSCRIPTEN)
     web_embed_file("js")
 
     # add_link_options()
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
 endif ()
 
-add_subdirectory("box2d")
+# add_subdirectory("box2d")
 add_subdirectory("quickjs")
 add_subdirectory("physfs")
 add_subdirectory("raylib")
@@ -62,4 +65,4 @@ if (EMSCRIPTEN)
 endif ()
 
 target_link_libraries("${GAME_NAME}" m) # math library
-target_link_libraries("${GAME_NAME}" box2d quickjs raylib physfs-static)
+target_link_libraries("${GAME_NAME}" quickjs raylib physfs-static)

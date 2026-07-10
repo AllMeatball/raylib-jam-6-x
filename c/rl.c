@@ -1,8 +1,11 @@
 #include "rl.h"
 #include "quickjs/quickjs.h"
 #include "raylib/src/raylib.h"
+#include "raylib/src/raymath.h"
+
 #include "script.h"
 
+#include <math.h>
 #include <stdint.h>
 
 // CLASS BINDINGS
@@ -17,7 +20,27 @@
 
 JSAtom RL_ATOM_X, RL_ATOM_Y;
 JSAtom RL_ATOM_WIDTH, RL_ATOM_HEIGHT;
-JSAtom RL_ATOM_GROUP;
+
+JSAtom RL_ATOM_RADIUS;
+JSAtom RL_ATOM_GROUP, RL_ATOM_MASK, RL_ATOM_RESOLVE;
+
+#define RL_GLOBAL_GROUP (0)
+
+#define USE_CIRCLE_COLLISION
+#ifdef USE_CIRCLE_COLLISION
+struct RL_CollisonBox {
+    float radius;
+    Vector2 position;
+    uint32_t group, mask;
+    bool resolve;
+};
+#else
+struct RL_CollisonBox {
+    Rectangle rect;
+    uint32_t group, mask;
+    bool resolve;
+};
+#endif
 
 // NOTE: for future devs using QuickJS. using atoms can gain you a lot performance --
 // I was really under the assumption that it was badly batched draw calls.
@@ -29,6 +52,10 @@ void RL_LoadAtoms(ScriptEngine *engine) {
     RL_ATOM_HEIGHT = JS_NewAtom(engine->ctx, "height");
 
     RL_ATOM_GROUP = JS_NewAtom(engine->ctx, "group");
+    RL_ATOM_MASK = JS_NewAtom(engine->ctx, "mask");
+
+    RL_ATOM_RESOLVE = JS_NewAtom(engine->ctx, "resolve");
+    RL_ATOM_RADIUS = JS_NewAtom(engine->ctx, "radius");
 }
 
 void RL_UnloadAtoms(ScriptEngine *engine) {
@@ -37,6 +64,9 @@ void RL_UnloadAtoms(ScriptEngine *engine) {
     JS_FreeAtom(engine->ctx, RL_ATOM_WIDTH);
     JS_FreeAtom(engine->ctx, RL_ATOM_HEIGHT);
     JS_FreeAtom(engine->ctx, RL_ATOM_GROUP);
+    JS_FreeAtom(engine->ctx, RL_ATOM_MASK);
+    JS_FreeAtom(engine->ctx, RL_ATOM_RESOLVE);
+    JS_FreeAtom(engine->ctx, RL_ATOM_RADIUS);
 }
 
 Color RL_GetColor(JSContext *ctx, JSValue color_obj) {
@@ -501,13 +531,7 @@ JSValue RL_SetCursorEnabled_JSAPI(JSContext *ctx, JSValueConst this_val, int arg
     return JS_UNDEFINED;
 }
 
-#define RL_GLOBAL_GROUP (0)
-
-struct RL_CollisonBox {
-    Rectangle rect;
-    uint32_t group;
-};
-
+#ifdef USE_CIRCLE_COLLISION
 JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     if (argc < 2) {
         JSValue err = JS_NewError(ctx);
@@ -518,8 +542,145 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
     }
 
     JSValue callback = JS_GetPropertyStr(ctx, argv[0], "collisionCallback");
+    if (JS_IsException(callback))
+        return JS_EXCEPTION;
 
-    if (JS_IsUndefined(callback))
+    int boxes_count = argc - 1;
+    struct RL_CollisonBox *boxes = js_mallocz(ctx, boxes_count * sizeof(struct RL_CollisonBox));
+
+    if (!boxes)
+        return JS_EXCEPTION;
+
+    for (int i = 0; i < boxes_count; i++) {
+        struct RL_CollisonBox *box = boxes + i;
+        box->position = RL_GetVector2(ctx, argv[i+1]);
+        JSValue resolve_obj = JS_GetProperty(ctx, argv[i+1], RL_ATOM_RESOLVE);
+        JSValue radius_obj = JS_GetProperty(ctx, argv[i+1], RL_ATOM_RADIUS);
+        JSValue group_obj  = JS_GetProperty(ctx, argv[i+1], RL_ATOM_GROUP);
+        JSValue mask_obj   = JS_GetProperty(ctx, argv[i+1], RL_ATOM_MASK);
+
+        if (JS_IsUndefined(group_obj))
+            box->group = RL_GLOBAL_GROUP;
+        else
+            JS_ToUint32(ctx, &box->group, group_obj);
+
+        if (JS_IsUndefined(mask_obj))
+            box->mask = 0;
+        else
+            JS_ToUint32(ctx, &box->mask, mask_obj);
+
+        if (JS_IsUndefined(resolve_obj))
+            boxes[i].resolve = false;
+        else
+            boxes[i].resolve = JS_ToBool(ctx, resolve_obj);
+
+        if (JS_IsUndefined(radius_obj))
+            boxes[i].radius = 0;
+        else {
+            double radius;
+            JS_ToFloat64(ctx, &radius, radius_obj);
+            box->radius = radius;
+            // printf("%f\n", radius);
+        }
+
+        JS_FreeValue(ctx, group_obj);
+        JS_FreeValue(ctx, mask_obj);
+        JS_FreeValue(ctx, radius_obj);
+    }
+
+    JSValue cb_params[4];
+    for (int i = 0; i < boxes_count; i++) {
+        struct RL_CollisonBox box1 = boxes[i];
+
+        // TODO: no double iter here
+        for (int j = 0; j < boxes_count; j++) {
+            if (i == j)
+                continue;
+
+            struct RL_CollisonBox box2 = boxes[j];
+
+            if ( box1.group & box2.mask )
+                continue;
+
+
+            Vector2 result1 = {.x = 0, .y = 0};
+            Vector2 result2 = {.x = 0, .y = 0};
+
+            // unrolling some of the code for CheckCollisionCircles from raymath.h for optimizations
+
+            float dx = box1.position.x - box2.position.x;      // X distance between centers
+            float dy = box1.position.y - box2.position.y;      // Y distance between centers
+
+            float distance_squared = dx*dx + dy*dy; // Distance between centers squared
+            float radius_sum = box1.radius + box2.radius;
+
+            bool collision = (distance_squared <= (radius_sum*radius_sum));
+
+            // check_collisions:
+            if (collision) {
+
+                cb_params[0] = argv[i+1];
+                cb_params[1] = argv[j+1];
+
+                if (box1.resolve && box2.resolve) {
+                    float dist = sqrtf(distance_squared);
+
+                    if (fabsf(dist) <= 0) {
+                        dist = 10;
+                    }
+
+                    float sep_x = (dx) / dist;
+                    float sep_y = (dy) / dist;
+
+                    // result1.x =  sep_x * (dx * 0.5);
+                    // result1.y =  sep_y * (dy * 0.5);
+                    //
+                    // result2.x = -sep_x * (dx * 0.5);
+                    // result2.y = -sep_y * (dy * 0.5);
+
+                    result2.x = (box1.position.x - sep_x * radius_sum - box2.position.x) * 0.4;
+                    result2.y = (box1.position.y - sep_y * radius_sum - box2.position.y) * 0.4;
+
+                    result1.x = (box2.position.x + sep_x * radius_sum - box1.position.x) * 0.4;
+                    result1.y = (box2.position.y + sep_y * radius_sum - box1.position.y) * 0.4;
+                }
+
+                cb_params[2] = RL_CreateVector2(ctx, result1);
+                cb_params[3] = RL_CreateVector2(ctx, result2);
+
+                JSValue result = JS_Call(ctx, callback, argv[0], 4, cb_params);
+
+                if (JS_IsException(result)) {
+                    JS_FreeValue(ctx, callback);
+                    JS_FreeValue(ctx, cb_params[2]);
+                    JS_FreeValue(ctx, cb_params[3]);
+                    js_free(ctx, boxes);
+                    return JS_EXCEPTION;
+                }
+
+                JS_FreeValue(ctx, result);
+                JS_FreeValue(ctx, cb_params[2]);
+                JS_FreeValue(ctx, cb_params[3]);
+            }
+        }
+    }
+
+    js_free(ctx, boxes);
+    JS_FreeValue(ctx, callback);
+    return JS_UNDEFINED;
+}
+#else
+JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc < 2) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "this, ...rects not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    JSValue callback = JS_GetPropertyStr(ctx, argv[0], "collisionCallback");
+    if (JS_IsException(callback))
         return JS_EXCEPTION;
 
     int boxes_count = argc - 1;
@@ -531,17 +692,24 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
     for (int i = 0; i < boxes_count; i++) {
         struct RL_CollisonBox *box = boxes + i;
         box->rect = RL_GetRectangle(ctx, argv[i+1]);
-        JSValue group_obj = JS_GetProperty(ctx, argv[i+1], RL_ATOM_GROUP);
+        JSValue group_obj  = JS_GetProperty(ctx, argv[i+1], RL_ATOM_GROUP);
+        JSValue mask_obj   = JS_GetProperty(ctx, argv[i+1], RL_ATOM_MASK);
 
         if (JS_IsUndefined(group_obj))
-            boxes[i].group = RL_GLOBAL_GROUP;
+            box->group = RL_GLOBAL_GROUP;
         else
             JS_ToUint32(ctx, &box->group, group_obj);
 
+        if (JS_IsUndefined(mask_obj))
+            box->mask = 0;
+        else
+            JS_ToUint32(ctx, &box->mask, mask_obj);
+
         JS_FreeValue(ctx, group_obj);
+        JS_FreeValue(ctx, mask_obj);
     }
 
-    JSValue rect_pair[2];
+    JSValue cb_params[2];
     for (int i = 0; i < boxes_count; i++) {
         struct RL_CollisonBox box1 = boxes[i];
 
@@ -552,20 +720,15 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
 
             struct RL_CollisonBox box2 = boxes[j];
 
-            uint32_t group_mask = (box1.group & box2.group);
-
-            if (group_mask == RL_GLOBAL_GROUP)
-                goto check_collisions;
-
-            if ( (box1.group ^ group_mask) == 0 )
+            if ( box1.group & box2.mask )
                 continue;
 
-            check_collisions:
+            // check_collisions:
             if (CheckCollisionRecs(box1.rect, box2.rect)) {
-                rect_pair[0] = argv[i+1];
-                rect_pair[1] = argv[j+1];
+                cb_params[0] = argv[i+1];
+                cb_params[1] = argv[j+1];
 
-                JSValue result = JS_Call(ctx, callback, argv[0], 2, rect_pair);
+                JSValue result = JS_Call(ctx, callback, argv[0], 2, cb_params);
 
                 if (JS_IsException(result)) {
                     JS_FreeValue(ctx, callback);
@@ -577,11 +740,11 @@ JSValue RL_HandleBulkCollisionCheck_JSAPI(JSContext *ctx, JSValueConst this_val,
         }
     }
 
-
     // js_free(ctx, rects);
     JS_FreeValue(ctx, callback);
     return JS_UNDEFINED;
 }
+#endif
 
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Sound = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);

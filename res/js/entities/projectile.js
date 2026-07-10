@@ -38,8 +38,11 @@ class Projectile {
         this.hitbox = {
             x: 0,
             y: 0,
-            width:  this.radius * 2.0,
-            height: this.radius * 2.0
+            radius: this.radius,
+            resolve: false,
+            // width:  this.radius * 2.0,
+            // height: this.radius * 2.0,
+            mask:   PHYS_GROUP.PLAYER,
         };
 
         this.decay = -0.5;

@@ -6,19 +6,25 @@ class Humanoid {
     color = [255,255,255];
 
     hitbox = {
-        x: 310,
-        y: 355,
+        x: 0,
+        y: 32,
+        // width: 32,
+        // height: 32,
 
-        width: 428,
-        height: 609,
+        radius: 32,
+        resolve: true,
     };
 
+
     damping = 0.15;
+    // smooth_velocity = true;
 
     velocity = new Vector2();
 
     visual = {
         timer: 0,
+        bob_speed: 0.16,
+        extra_angle: 0,
         anim_scale: 0,
         dir_x: 1,
     };
@@ -50,16 +56,18 @@ class Humanoid {
     setupBody(texture, shadow_texture, rect) {
         this.body = new Body(texture, shadow_texture, rect);
 
-        this.hitbox.x *= this.body.scale;
-        this.hitbox.y *= this.body.scale;
-        this.hitbox.width  *= this.body.scale;
-        this.hitbox.height *= this.body.scale;
+        // this.hitbox.x *= this.body.scale;
+        // this.hitbox.y *= this.body.scale;
+        // this.hitbox.width  *= this.body.scale;
+        // this.hitbox.height *= this.body.scale;
     }
 
     getHitbox() {
         const hitbox = {...this.hitbox};
-        hitbox.x += this.pos.x;
-        hitbox.y += this.pos.y;
+        const center = this.body.getCenter();
+
+        hitbox.x += this.pos.x + center.x;
+        hitbox.y += this.pos.y + center.y;
 
         return hitbox;
     }
@@ -72,14 +80,6 @@ class Humanoid {
 
         let moving_x = Math.abs(this.dir.x) > 0;
         let moving_y = Math.abs(this.dir.y) > 0;
-
-        if (moving_x || moving_y)
-            this.visual.anim_scale += dt * 8;
-        else
-            this.visual.anim_scale -= dt * 4;
-
-        this.visual.anim_scale = Clamp(this.visual.anim_scale, 0.0, 1.0);
-        this.visual.timer += dt * this.visual.anim_scale;
 
         let speed_mult = 1;
         if (moving_x && moving_y)
@@ -95,42 +95,49 @@ class Humanoid {
             y: this.velocity.y * dt,
         });
 
-        this.pos.x += this.velocity.x * dt;
-        this.pos.y += this.velocity.y * dt;
+        if (moving_x || moving_y)
+            this.visual.anim_scale += dt * 8;
+        else
+            this.visual.anim_scale -= dt * 4;
 
-        this.pos.x = Clamp(this.pos.x, -64, SCREEN_SIZE - 96);
-        this.pos.y = Clamp(this.pos.y, -64, SCREEN_SIZE - 96);
+        this.visual.anim_scale = Clamp(this.visual.anim_scale, 0.0, 1.0);
+        this.visual.timer += dt * this.visual.anim_scale;
+
+        if (this.dir.x > 0 || this.dir.x < 0)
+            this.visual.dir_x = Math.sign(this.dir.x);
 
         this.velocity.x *= (1 - this.damping);
         this.velocity.y *= (1 - this.damping);
 
-        if (this.dir.x > 0 || this.dir.x < 0)
-            this.visual.dir_x = Math.sign(this.dir.x);
+        this.pos.x += this.velocity.x * dt;
+        this.pos.y += this.velocity.y * dt;
     }
 
     draw() {
-        const speed = this.speed / 6;
+        const speed = this.speed * this.visual.bob_speed;
         const pos_offset = {
             x: 0,
-            y: (Math.abs(Math.cos(this.visual.timer * speed)  * 4.0) - 4) * this.visual.anim_scale,
+            y: (Math.abs(Math.cos(this.visual.timer * speed) * 4.0) - 4) * this.visual.anim_scale,
         };
 
-        const angle = (Math.cos(this.visual.timer * (speed * 1.125))) * this.visual.anim_scale;
+        const angle = (Math.cos(this.visual.timer * (speed * 1.125)) + this.visual.extra_angle) * this.visual.anim_scale;
 
         this.body.draw(this.pos, pos_offset, angle, {x: 1}, this.color, this.visual.dir_x < 0);
 
         if (GLOBAL_FLAGS.includes("boxes")) {
-            const center = this.body.getCenter();
             const hitbox = this.getHitbox();
-            RL_DrawRectangle(hitbox, chroma('red').alpha(0.5).rgba());
 
-            const player_origin = {
-                x: this.pos.x + center.x,
-                y: this.pos.y + center.y
-            };
+            RL_DrawCircle({x: hitbox.x, y: hitbox.y}, this.hitbox.radius, chroma('red').alpha(0.5).rgba());
 
-            if (this instanceof ENT_CLASS.Player)
+            if (this instanceof ENT_CLASS.Player) {
+                const center = this.body.getCenter();
+                const player_origin = {
+                    x: this.pos.x + center.x,
+                    y: this.pos.y + center.y
+                };
+
                 RL_DrawCircle(player_origin, this.wand.radius, chroma('yellow').alpha(0.5).rgba());
+            }
         }
     }
 }

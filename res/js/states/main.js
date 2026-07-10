@@ -1,6 +1,9 @@
 const MainState = {
+    hivemind: new Hivemind(),
+
     enter() {
         ENTITIES.length = 0;
+        this.hivemind.mob.length = 0;
 
         this.gameover_timer = 0;
         this.gameover_timer_target = Infinity;
@@ -9,10 +12,13 @@ const MainState = {
         this.gameover = false;
 
         this.PLAYER = new ENT_CLASS.Player({x: 0, y: 0});
+        this.hivemind.target = this.PLAYER;
+
         ENTITIES.push(this.PLAYER);
 
+        this.song_pitch = 0.85;
         this.song = GetAsset('music.wizardtower');
-        this.song.setPitch(0.85);
+        this.song.setPitch(this.song_pitch);
         this.song.play();
 
         RL_SetCursorEnabled(false);
@@ -23,7 +29,6 @@ const MainState = {
             return;
 
         this.gameover = true;
-        this.song.stop();
 
         const sound = GetAsset('sfx.gameover');
         sound.setPitch(2);
@@ -33,47 +38,34 @@ const MainState = {
     },
 
     debugKeys() {
-        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_C)) {
-            const mouse_pos = RL_GetMousePosition();
-            ENTITIES.push(
-                new ENT_CLASS.Enemy({
-                    target: this.PLAYER,
-                    x: mouse_pos.x,
-                    y: mouse_pos.y
-                })
-            );
-
-            // ENTITIES.push(
-            //     new ENT_CLASS.Dot(mouse_pos.x, mouse_pos.y)
-            // );
-        }
-
-        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_K)) {
-            for (let i = 0; i < 100; i++) {
-            const mouse_pos = RL_GetMousePosition();
-            ENTITIES.push(
-                new ENT_CLASS.Enemy({
-                    target: this.PLAYER,
-                    x: mouse_pos.x,
-                    y: mouse_pos.y
-                })
-            );
-            }
-        }
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_C))
+            this.hivemind.create(1);
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_K))
+            this.hivemind.create(100);
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_L))
+            this.hivemind.createLeader(this.PLAYER);
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_P))
+            this.hivemind.spawnWave(20);
     },
 
     update(dt) {
         if (this.gameover) {
             this.gameover_timer += dt;
+            if (this.song_pitch > 0.45) {
+                this.song_pitch -= dt;
+                this.song.setPitch(this.song_pitch);
+            }
+
             if (this.gameover_timer > this.gameover_timer_target) {
+                this.song.stop();
+
                 STATES.TITLE.enter();
                 STATES.current = STATES.TITLE;
             }
+            return;
         } else {
             this.timer += dt;
         }
-
-        CollisionSystem.update();
 
         if (GLOBAL_FLAGS.includes('debug'))
             this.debugKeys();
@@ -87,6 +79,9 @@ const MainState = {
 
             ent.update(dt);
         }
+
+        CollisionSystem.update();
+        this.hivemind.update();
     },
 
     gameover_color: [255,0,0],

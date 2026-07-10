@@ -6,6 +6,13 @@ globalThis.TIMER = 0;
 globalThis.GLOBAL_FLAGS = [];
 globalThis.ENTITIES = [];
 globalThis.CollisionSystem = require('./collsionsys.js');
+globalThis.Hivemind = require('./hivemind.js');
+
+
+globalThis.PHYS_GROUP = Object.freeze({
+    PLAYER: 1,
+    ENEMY:  2,
+});
 
 globalThis.SCREEN_SIZE = 720;
 for (let i = 0; i < LAUNCH_ARGS.length; i++) {
