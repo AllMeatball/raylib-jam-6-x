@@ -23,6 +23,12 @@ bool has_shutdown = false;
 bool restart = false;
 bool running = true;
 
+#if defined(PLATFORM_DESKTOP)
+    #define GLSL_VERSION            330
+#else   // PLATFORM_ANDROID, PLATFORM_WEB
+    #define GLSL_VERSION            100
+#endif
+
 void GameUpdate() {
     float dt = GetFrameTime();
     JSValue dt_value = JS_NewFloat64(engine->ctx, dt);
@@ -92,6 +98,7 @@ int main(int argc, char **argv) {
     RL_LoadAtoms(engine);
     RL_LoadScriptingFunctions(engine);
 
+    JS_SetPropertyStr(engine->ctx, engine->globals, "GLSL_VERSION", JS_NewInt64(engine->ctx, GLSL_VERSION));
     ScriptEngine_RegisterFunc(engine, ENGINE_Restart);
 
     // ScriptEngine_Eval(engine, NULL, "<debug:init>", "import * as os  from \"os\"; console.log(os.readdir('.'));", 0, JS_EVAL_TYPE_MODULE);

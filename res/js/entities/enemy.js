@@ -1,6 +1,6 @@
 // const ENEMY_SPRITE_COUNT = 4;
 const ENEMY_SPRITE_COUNT = 1;
-const ENEMY_SHADER = new RL_Shader(null, "gfx/enemy.fs");
+const ENEMY_SHADER = new RL_Shader(null, `gfx/enemy.${GLSL_VERSION}.fs`);
 
 const RANDOM_COLORS = [
     'red',
@@ -99,7 +99,8 @@ class Enemy extends Humanoid {
 
         this.hivemind = params.hivemind;
         this.health = this.hivemind.wave.health;
-        this.speed = this.hivemind.wave.speed;
+        this.speed  = this.hivemind.wave.speed;
+        this.damage = this.hivemind.wave.damage;
 
         this.target = params.target;
         this.pos.x = params.x;
