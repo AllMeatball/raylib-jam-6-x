@@ -53,20 +53,38 @@ config.icons.forEach((path) => {
     icons.push(icon);
 });
 RL_SetWindowIcons(...icons);
+RL_SetMasterVolume(0.5);
 
 const BG_COLOR = chroma(0x187a3e).rgb();
 const MAIN_FONT = new RL_Font('fonts/GochiHand-Regular.ttf', 64);
 const TITLE_FONT = new RL_Font('fonts/PatrickHand-Regular.ttf', 256);
-
 require('./assets.js');
 
 const Spells = require('./spells.js');
+const Slider = require('./slider.js');
 const Body = require("./body.js");
 const Humanoid = require("./entities/humanoid.js");
 const PatternSystem = require("./patterns.js");
 
 
 const PROJECTILES = require("./entities/projectile.js");
+const VOLUME_SLIDER = new Slider({
+    title: "Volume",
+
+    x: SCREEN_SIZE * 0.5 - 256 * 0.5,
+    y: SCREEN_SIZE - 64,
+
+    width: 256,
+    height: 10,
+
+    setter: (value) => {
+        RL_SetMasterVolume(value);
+    },
+
+    getter: () => {
+        return RL_GetMasterVolume();
+    },
+});
 
 const ENT_CLASS = {
     TempText: require('./entities/temptext.js'),

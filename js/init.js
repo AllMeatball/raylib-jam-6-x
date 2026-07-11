@@ -148,7 +148,8 @@ globalThis.PauseAllSound = function() {
     for (const key in _asset_list) {
         const asset = _asset_list[key];
 
-        if ( !(asset instanceof RL_MusicStream || asset instanceof RL_Sound) )
+        // if ( !(asset instanceof RL_MusicStream || asset instanceof RL_Sound) )
+        if ( !(asset instanceof RL_Sound) )
             continue;
 
 

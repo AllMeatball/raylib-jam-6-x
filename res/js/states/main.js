@@ -75,6 +75,7 @@ const MainState = {
     update(dt) {
         if (RL_IsKeyPressed(RL_KeyboardKey.KEY_ENTER)) {
             this.paused = !this.paused;
+            RL_SetCursorEnabled(this.paused);
 
             if (this.paused)
                 PauseAllSound();
@@ -82,8 +83,10 @@ const MainState = {
                 ResumeAllSound();
         }
 
-        if (this.paused)
+        if (this.paused) {
+            VOLUME_SLIDER.update();
             return;
+        }
 
         if (this.gameover) {
             this.gameover_timer += dt;
@@ -183,6 +186,7 @@ const MainState = {
                 height: SCREEN_SIZE
             }, [0,0,0, 0.5]);
             RL_DrawCenterText(TITLE_FONT, "PAUSED", 0.5, 0.5, 128, [255,255,255])
+            VOLUME_SLIDER.draw();
             return;
         }
 
