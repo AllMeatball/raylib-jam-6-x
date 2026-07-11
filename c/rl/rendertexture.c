@@ -77,3 +77,30 @@ JSValue CLASSCTOR_RL_RenderTexture(JSContext *ctx, JSValueConst new_target, int 
 
     return obj;
 }
+
+JSValue CLASSFUNC_RL_RenderTexture_Apply(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue func = JS_UNDEFINED;
+    RenderTexture *render_texture = JS_GetOpaque2(ctx, this_val, CLASSID_RL_RenderTexture);
+    if (!render_texture)
+        return JS_EXCEPTION;
+
+    if (argc < 1) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "func not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    func = argv[0];
+
+    BeginTextureMode(*render_texture);
+    JSValue result = JS_Call(ctx, func, JS_UNDEFINED, 0, NULL);
+    if (JS_IsException(result)) {
+        EndTextureMode();
+        return JS_EXCEPTION;
+    }
+
+    EndTextureMode();
+    return JS_UNDEFINED;
+}
