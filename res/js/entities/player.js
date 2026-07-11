@@ -18,6 +18,7 @@ class Player extends Humanoid {
         );
 
         this.wand = new Wand(this);
+        this.wand.slots.addSpell(new Spells.spell.Basic());
     }
 
     update(dt) {
@@ -55,6 +56,10 @@ class Player extends Humanoid {
         if (!this.wand.backdraw)
             this.wand.draw();
     }
+
+    getSpellSlots() {
+        return this.wand.slots;
+    }
 }
 
 class Wand {
@@ -68,6 +73,8 @@ class Wand {
 
     radius = 96;
     backdraw = true;
+
+    slots = new Spells.SpellSlots();
 
     constructor(parent) {
         this.parent = parent;
@@ -90,6 +97,22 @@ class Wand {
     }
 
     update(dt) {
+        let selected_index = undefined;
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_ONE)) {
+            selected_index = 1;
+        } else if (RL_IsKeyPressed(RL_KeyboardKey.KEY_TWO)) {
+            selected_index = 2;
+        } else if (RL_IsKeyPressed(RL_KeyboardKey.KEY_THREE)) {
+            selected_index = 3;
+        } else if (RL_IsKeyPressed(RL_KeyboardKey.KEY_FOUR)) {
+            selected_index = 4;
+        } else if (RL_IsKeyPressed(RL_KeyboardKey.KEY_FIVE)) {
+            selected_index = 5;
+        }
+
+        if (selected_index !== undefined)
+            this.slots.swapWithAux(selected_index);
+
         if (this.cast_timer > 0)
             this.cast_timer -= dt;
 
@@ -124,10 +147,19 @@ class Wand {
         this.SFX_MAGIK.play();
         this.SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
 
-        const pos = this.getAbsolutePos();
-        globalThis.ENTITIES.push(new ENT_CLASS.Projectile(this.parent, pos.x, pos.y, this.angle, 512));
+        const result = this.slots.next(this);
+        let delay = this.cast_delay;
 
-        this.cast_timer = this.cast_delay;
+        if (!result) {
+            this.cast_timer = delay;
+            return;
+        }
+
+        delay *= (result.delay || 1)
+        if (result.entities)
+            ENTITIES.push(...result.entities);
+
+        this.cast_timer = delay;
     }
 
     draw() {

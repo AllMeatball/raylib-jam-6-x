@@ -11,5 +11,5 @@
 * Explosive - makes previous bullets explodes after x (random) amount of time (hurts the player as well)
 * Arrow - makes an arrow (^ like this) shaped set of bullets
 * (DONE) Circle - make circle of bullets around player
-* Double - double last couple of spells
+* (DONE) Double - double next couple of spells
 * (DONE) Teleport - (single particle) disappears after certain amount of time and teleports player

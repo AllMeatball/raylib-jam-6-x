@@ -60,18 +60,24 @@ const TITLE_FONT = new RL_Font('fonts/PatrickHand-Regular.ttf', 256);
 
 require('./assets.js');
 
+const Spells = require('./spells.js');
 const Body = require("./body.js");
 const Humanoid = require("./entities/humanoid.js");
 const PatternSystem = require("./patterns.js");
 
+
+const PROJECTILES = require("./entities/projectile.js");
+
 const ENT_CLASS = {
     TempText: require('./entities/temptext.js'),
-    Projectile: require("./entities/projectile.js"),
     Player: require("./entities/player.js"),
     Enemy: require("./entities/enemy.js"),
     SpellDrop: require("./entities/spelldrop.js"),
     Dot:  require("./entities/dot.js"),
+    ...PROJECTILES
 };
+
+
 
 let STATES = {
     TITLE: require("./states/title.js"),

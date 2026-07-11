@@ -1,5 +1,6 @@
 const MainState = {
     health_text_color: chroma(0xff9292).rgba(),
+    slots_font_size: 26,
     paused: false,
     bg: GetAsset('texture.bg'),
 
@@ -119,6 +120,34 @@ const MainState = {
         this.hivemind.update(dt);
     },
 
+    drawSlots() {
+        const slots = this.PLAYER.getSpellSlots();
+        for (let i = 0; i < slots.max_slots; i++) {
+            let name = "[NONE]";
+            const spell = slots.slots[i];
+
+            if (spell)
+                name = spell.name
+
+            RL_DrawTextEx(MAIN_FONT, `${ i+1 }: ${name}`, {
+                x: 0,
+                y: SCREEN_SIZE + (i * this.slots_font_size) - ( (slots.max_slots + 1) * this.slots_font_size)
+            }, this.slots_font_size, 4, [255,255,255]);
+        }
+
+
+        let name = "[NONE]";
+        const spell = slots.aux_slot;
+
+        if (spell)
+            name = spell.name
+
+        RL_DrawTextEx(MAIN_FONT, `AUX: ${name}`, {
+            x: 0,
+            y: SCREEN_SIZE - this.slots_font_size
+        }, this.slots_font_size, 4, this.health_text_color);
+    },
+
     gameover_color: [255,0,0],
     draw() {
         // RL_ClearBackground(BG_COLOR);
@@ -133,21 +162,17 @@ const MainState = {
         for (ent of draw_order)
             ent.draw();
 
+        RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
+
         if (GLOBAL_FLAGS.includes('debug'))
             RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}, #ENTS: ${ENTITIES.length}`, {x: 0, y: 64}, 64, 4, this.health_text_color);
         else
             RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}`, {x: 0, y: 64}, 64, 4, this.health_text_color);
 
         const time_text = secondsToString(this.timer);
-
-        // RL_DrawTextEx(MAIN_FONT, time_text, {
-        //     x: SCREEN_SIZE * 0.5 - time_text_size.width  * 0.5,
-        //     y: SCREEN_SIZE * 0.5 - time_text_size.height * 0.5
-        // }, 64, 4, [255,255,255]);
-
         RL_DrawCenterText(MAIN_FONT, time_text, 0.5, 1.0, 64, [255,255,255]);
 
-        RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
+        this.drawSlots();
 
         if (this.paused && !this.gameover) {
             RL_DrawRectangle({

@@ -14,6 +14,8 @@ class Projectile {
 
     collidable = true;
 
+    onDecay() { }
+
     onCollision(other) {
         if (other instanceof Projectile || other instanceof ENT_CLASS.SpellDrop)
             return;
@@ -22,22 +24,24 @@ class Projectile {
             return;
 
 
-        if (!this.delete)
+        if (!this.delete) {
             other.doDamage(this.damage, this.angle);
             this.delete = true;
+        }
     }
 
-    constructor(creator, x, y, angle, speed) {
-        this.pos.x = x;
-        this.pos.y = y;
+    constructor(params) {
+        this.pos.x = params.x || 0;
+        this.pos.y = params.y || 0;
 
         this.texture = GetAsset('texture.projectile');
-        this.base_color = chroma.temperature( (speed / 512) * 2000).mix('red', 0.25).saturate();
+        this.base_color = chroma.temperature( (params.speed / 512) * 2000).mix('red', 0.25).saturate() || this.base_color;
         this.color = this.base_color.darken(Math.sin(TIMER * 8.0)).rgb();
 
-        this.angle = angle;
-        this.speed = speed;
-        this.creator = creator;
+        this.angle = params.angle || 0;
+        this.speed = params.speed || 512;
+        this.damage = params.damage || 10;
+        this.creator = params.creator;
 
         this.hitbox = {
             x: 0,
@@ -49,18 +53,8 @@ class Projectile {
             mask:   PHYS_GROUP.PLAYER | PHYS_GROUP.PICKUP,
         };
 
-        this.decay = -0.5;
-    }
-
-    damageEntity(entity) {
-        if (entity === this.creator)
-            return;
-
-        if (entity instanceof Projectile)
-            return;
-
-        entity.velocity.x += 32;
-        entity.velocity.y += 32;
+        this.decay = params.decay_start || -0.5;
+        this.decay_target = params.decay || 0.8;
     }
 
     getHitbox() {
@@ -90,7 +84,11 @@ class Projectile {
 
 
         if (this.decay > this.decay_target) {
-            this.delete = true;
+            if (!this.delete) {
+                this.delete = true;
+                this.onDecay();
+            }
+
         } else {
             this.decay += dt;
         }
@@ -114,4 +112,26 @@ class Projectile {
     }
 }
 
-module.exports = Projectile;
+class TeleportProjectile extends Projectile {
+    onDecay() {
+        // console.log('zoop');
+        GetAsset('sfx.teleport').play();
+
+        this.creator.pos.x = this.pos.x;
+        this.creator.pos.y = this.pos.y;
+    }
+
+    constructor(params) {
+        super(params);
+        this.decay = -0.1;
+        this.decay_target = 0.2;
+        this.base_color = chroma('magenta');
+    }
+
+    onCollision(_other) { }
+}
+
+module.exports = {
+    Projectile: Projectile,
+    TeleportProjectile: TeleportProjectile,
+};

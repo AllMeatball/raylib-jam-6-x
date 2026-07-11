@@ -6,6 +6,7 @@ const TitleState = {
         width: 0,
         height: 0
     },
+    bg: GetAsset('texture.bg'),
 
     enter() {
         this.hat = GetAsset('texture.hat');
@@ -36,7 +37,8 @@ const TitleState = {
     },
 
     draw() {
-        RL_ClearBackground(BG_COLOR);
+        // RL_ClearBackground(BG_COLOR);
+        this.bg.draw({x: 0, y:0}, 0, 1, [230,230,230]);
 
         const title_text_info = RL_DrawCenterText(TITLE_FONT, "Hexzard", 0.5, 0.5, 256, this.title_color);
 

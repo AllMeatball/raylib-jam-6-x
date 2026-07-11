@@ -41,7 +41,7 @@ class Enemy extends Humanoid {
             const center = this.body.getCenter();
             this.drop.pos.x = this.pos.x + center.x;
             this.drop.pos.y = this.pos.y + center.y;
-            this.drop.pos.z = this.pos.y;
+            this.drop.pos.z = -Infinity;
 
             ENTITIES.push(this.drop);
         }
