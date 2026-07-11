@@ -106,8 +106,6 @@ class Wand {
             selected_index = 3;
         } else if (RL_IsKeyPressed(RL_KeyboardKey.KEY_FOUR)) {
             selected_index = 4;
-        } else if (RL_IsKeyPressed(RL_KeyboardKey.KEY_FIVE)) {
-            selected_index = 5;
         }
 
         if (selected_index !== undefined)
@@ -144,18 +142,29 @@ class Wand {
         if (this.cast_timer > 0)
             return;
 
-        this.SFX_MAGIK.play();
-        this.SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
-
-        const result = this.slots.next(this);
         let delay = this.cast_delay;
 
-        if (!result) {
-            this.cast_timer = delay;
+        // console.log(`${this.slots.index}`)
+        const result = this.slots.next(this);
+
+        if (result === undefined) {
+            this.cast_timer = 0;
             return;
         }
 
-        delay *= (result.delay || 1)
+        if (result.delay)
+            delay = result.delay;
+
+        // console.log(delay);
+
+        if (result.empty) {
+            this.cast_timer = 0;
+            return;
+        }
+
+        this.SFX_MAGIK.play();
+        this.SFX_MAGIK.setPitch(0.85 + (Math.random() * 0.05));
+
         if (result.entities)
             ENTITIES.push(...result.entities);
 

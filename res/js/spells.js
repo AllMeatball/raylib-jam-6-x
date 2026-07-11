@@ -1,11 +1,13 @@
 const DEFAULT_STATE = {
     speed_scale: 1,
+    damage_scale: 1,
     repeats: 1,
     repeat_index: 0,
 };
 
 class SpellSlots {
     index = 0;
+    last_valid_index = 0;
     max_slots = 4;
 
     slots = [];
@@ -34,7 +36,7 @@ class SpellSlots {
         }
 
         for (let i = 0; i < this.max_slots; i++) {
-            const is_slot_free = this.slots[i] === undefined;
+            const is_slot_free = !this.slots[i];
 
             if (is_slot_free) {
                 this.slots[i] = spell;
@@ -48,20 +50,30 @@ class SpellSlots {
             return;
 
         // console.log(this.index);
-        if (this.index >= this.slots.length) {
+        if (this.index >= this.max_slots) {
             this.index = 0;
             this.state = {...DEFAULT_STATE};
         }
 
         let spell = this.slots[this.index];
 
-        if (!spell) {
-            this.index++;
-            return { delay: 0 };
+        // if (!spell) {
+        //     this.index++;
+        //     return;
+        // }
+
+        let result = undefined;
+
+        if (spell) {
+            result = spell.activate(caller, this);
+            this.last_valid_index = this.index;
         }
 
-        const result = spell.activate(caller, this);
-        if (this.state.repeat_index < this.state.repeats-1 && !result.no_repeats) {
+        let no_repeats = false;
+        if (result)
+            no_repeats = result.no_repeats
+
+        if (this.state.repeat_index < this.state.repeats-1 && !no_repeats) {
             // console.log(this.index, this.state.repeat_index, this.state.repeats);
             this.state.repeat_index++;
         } else {
@@ -74,7 +86,9 @@ class SpellSlots {
 }
 
 class BasicSpell {
-    name = "Basic"
+    name = "Basic";
+    rarity = "common";
+
     activate (wand, slots) {
         const pos = wand.getAbsolutePos();
         return {
@@ -82,6 +96,7 @@ class BasicSpell {
                 creator: wand.parent,
                 x: pos.x,
                 y: pos.y,
+                damage: 10 * slots.state.damage_scale,
                 angle: wand.angle,
                 speed: 512 * slots.state.speed_scale
             })]
@@ -91,6 +106,7 @@ class BasicSpell {
 
 class CircleSpell {
     name = "Circle";
+    rarity = "common";
     amount = 20;
 
     activate (wand, slots) {
@@ -109,7 +125,7 @@ class CircleSpell {
                 y: pos.y,
                 angle: cur_slice,
                 speed: 420 * slots.state.speed_scale,
-                damage: 2,
+                damage: 2 * slots.state.damage_scale,
                 decay: 0.3
             });
 
@@ -121,32 +137,48 @@ class CircleSpell {
 }
 
 class SpeedBoostSpell {
-    name = "Proj. Speed"
+    name = "Proj. Speed";
+    rarity = "uncommon";
 
     activate (_, slots) {
         slots.state.speed_scale *= 2;
 
         return {
-            delay: 0
+            empty: true
         };
     }
 }
 
 class DoubleSpell {
-    name = "Double Cast"
+    name = "Double Cast";
+    rarity = "rare";
 
     activate (_, slots) {
         slots.state.repeats *= 2;
 
         return {
-            delay: 0,
+            empty: true,
             no_repeats: true,
         };
     }
 }
 
+class DoubleDamageSpell {
+    name = "Dbl-Damage"
+    rarity = "legendary";
+
+    activate (_, slots) {
+        slots.state.damage_scale *= 2;
+
+        return {
+            empty: true,
+        };
+    }
+}
+
 class TeleportSpell {
-    name = "Teleport"
+    name = "Teleport";
+    rarity = "rare";
 
     activate (wand, slots) {
         const pos = wand.getAbsolutePos();
@@ -166,11 +198,12 @@ class TeleportSpell {
 module.exports = {
     SpellSlots: SpellSlots,
     spell: {
-        Basic:    BasicSpell,
-        Circle:   CircleSpell,
-        Double:   DoubleSpell,
-        // Teleport: TeleportSpell,
-        Speed:    SpeedBoostSpell
+        Basic:     BasicSpell,
+        Circle:    CircleSpell,
+        Double:    DoubleSpell,
+        Teleport:  TeleportSpell,
+        DblDamage: DoubleDamageSpell,
+        Speed:     SpeedBoostSpell
     }
 }
 

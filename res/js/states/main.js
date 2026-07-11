@@ -124,6 +124,7 @@ const MainState = {
         const slots = this.PLAYER.getSpellSlots();
         for (let i = 0; i < slots.max_slots; i++) {
             let name = "[NONE]";
+            const color = (i == slots.last_valid_index) ? this.health_text_color : [255,255,255];
             const spell = slots.slots[i];
 
             if (spell)
@@ -132,7 +133,7 @@ const MainState = {
             RL_DrawTextEx(MAIN_FONT, `${ i+1 }: ${name}`, {
                 x: 0,
                 y: SCREEN_SIZE + (i * this.slots_font_size) - ( (slots.max_slots + 1) * this.slots_font_size)
-            }, this.slots_font_size, 4, [255,255,255]);
+            }, this.slots_font_size, 4, color);
         }
 
 

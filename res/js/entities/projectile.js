@@ -124,7 +124,7 @@ class TeleportProjectile extends Projectile {
     constructor(params) {
         super(params);
         this.decay = -0.1;
-        this.decay_target = 0.2;
+        this.decay_target = 0.4;
         this.base_color = chroma('magenta');
     }
 

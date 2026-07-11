@@ -75,7 +75,7 @@ class Enemy extends Humanoid {
 
         const atlas = GetAsset('texture.enemy');
 
-        if (Math.random() < 0.60)
+        if (Math.random() < 0.75)
             this.drop = new ENT_CLASS.SpellDrop({x: 0, y: 0});
 
         this.hitbox.group = PHYS_GROUP.ENEMY;
