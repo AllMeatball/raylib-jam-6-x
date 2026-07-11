@@ -126,7 +126,7 @@ class SpellDrop {
 
         const rarity = getRandomRarity();
         const spell = getRandomSpell(rarity);
-        spell.decay = (SPELL_WEIGHTS.sum_weight - spell.rarity_weight / 6);
+        spell.decay = (SPELL_WEIGHTS.sum_weight - spell.rarity_weight / 6) + 2;
         // console.log(spell);
 
         this.spell = spell;
@@ -151,6 +151,7 @@ class SpellDrop {
             x: this.pos.x - this.hitbox.radius,
             y: this.pos.y - this.hitbox.radius
         }
+
         this.texture.draw(pos, 0, this.texture_size, chroma(this.color).alpha(decay_alpha).rgba());
     }
 }

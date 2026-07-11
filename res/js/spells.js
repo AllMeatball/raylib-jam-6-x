@@ -126,7 +126,7 @@ class CircleSpell {
                 angle: cur_slice,
                 speed: 420 * slots.state.speed_scale,
                 damage: 2 * slots.state.damage_scale,
-                decay: 0.3
+                decay: 0.1
             });
 
             result.entities.push(proj);
