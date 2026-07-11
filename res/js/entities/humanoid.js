@@ -45,8 +45,27 @@ class Humanoid {
 
         this.health -= damage;
 
+        let text_scale = 1;
+        if (this instanceof ENT_CLASS.Player)
+            text_scale = 1.35;
+
+        const center = this.body.getCenter();
+        const text = new ENT_CLASS.TempText({
+            color: [255, 0, 0],
+            text: `-${Math.round(damage)}`,
+            x: this.pos.x + center.x,
+            y: this.pos.y + center.y,
+            start_time: -0.45,
+            font_size: 48 * text_scale,
+            time: 0.25,
+        });
+
+        ENTITIES.push(text);
+
         if (this.health < 0)
             this.health = 0;
+        else
+            this.health = Math.floor(this.health);
 
         if (angle) {
             const force = damage * 42;

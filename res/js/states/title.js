@@ -38,7 +38,7 @@ const TitleState = {
     draw() {
         RL_ClearBackground(BG_COLOR);
 
-        const title_text_info = RL_DrawCenterText(TITLE_FONT, "Hexzard", 0.5, 0.75, 256, this.title_color);
+        const title_text_info = RL_DrawCenterText(TITLE_FONT, "Hexzard", 0.5, 0.5, 256, this.title_color);
 
 
         const hat_pos = title_text_info[0];
@@ -47,7 +47,7 @@ const TitleState = {
 
         this.hat.draw(hat_pos, 0, 0.35, [255,255,255]);
 
-        const result = RL_DrawCenterText(MAIN_FONT, "Click me to start", 0.5 + (Math.cos(TIMER * 4) * 0.02), -3 + (Math.sin(TIMER * 4) * 0.02), 64, [255,255,255]);
+        const result = RL_DrawCenterText(MAIN_FONT, "Click me to start", 0.5 + (Math.cos(TIMER * 4) * 0.02), (Math.sin(TIMER) * 0.008) + 0.80, 64, [255,255,255]);
 
         const position = result[0];
         this.text_button.x = position.x;

@@ -1,6 +1,7 @@
 const MainState = {
     health_text_color: chroma(0xff9292).rgba(),
     paused: false,
+    bg: GetAsset('texture.bg'),
 
     enter() {
         ENTITIES.length = 0;
@@ -120,7 +121,8 @@ const MainState = {
 
     gameover_color: [255,0,0],
     draw() {
-        RL_ClearBackground(BG_COLOR);
+        // RL_ClearBackground(BG_COLOR);
+        this.bg.draw({x: 0, y:0}, 0, 1, [255,255,255]);
 
         const draw_order = ENTITIES;
         draw_order.sort((ent1, ent2) => {
@@ -132,14 +134,22 @@ const MainState = {
             ent.draw();
 
         if (GLOBAL_FLAGS.includes('debug'))
-            RL_DrawTextEx(MAIN_FONT, `Health: ${Math.round(this.PLAYER.health)}, #ENTS: ${ENTITIES.length}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
+            RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}, #ENTS: ${ENTITIES.length}`, {x: 0, y: 64}, 64, 4, this.health_text_color);
         else
-            RL_DrawTextEx(MAIN_FONT, `Health: ${Math.round(this.PLAYER.health)}`, {x: 0, y: SCREEN_SIZE - 64}, 64, 4, this.health_text_color);
+            RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}`, {x: 0, y: 64}, 64, 4, this.health_text_color);
 
-        RL_DrawTextEx(MAIN_FONT, `Time: ${ secondsToString(this.timer) }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
-        RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 64}, 64, 4, [255,255,255]);
+        const time_text = secondsToString(this.timer);
 
-        if (this.paused) {
+        // RL_DrawTextEx(MAIN_FONT, time_text, {
+        //     x: SCREEN_SIZE * 0.5 - time_text_size.width  * 0.5,
+        //     y: SCREEN_SIZE * 0.5 - time_text_size.height * 0.5
+        // }, 64, 4, [255,255,255]);
+
+        RL_DrawCenterText(MAIN_FONT, time_text, 0.5, 1.0, 64, [255,255,255]);
+
+        RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
+
+        if (this.paused && !this.gameover) {
             RL_DrawRectangle({
                 x: 0,
                 y: 0,

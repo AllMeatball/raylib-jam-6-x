@@ -9,6 +9,7 @@ class Hivemind {
         timer: 1,
 
         count: 10,
+        damage: 10,
         health: 15,
         speed: 32
     };
@@ -49,7 +50,9 @@ class Hivemind {
         this.wave.number++;
         this.wave.sound.play();
 
-        console.log(`spawned wave ${this.wave.number}`)
+        this.wave.count = Clamp(this.wave.count, 0, 135);
+
+        console.log(`spawned wave ${this.wave.number}: ${this.wave.count}`)
         for (let i = 0; i < this.wave.count; i++) {
             const angle = getRandomInt(0, 360) * (Math.PI / 180);
             const enemy = new ENT_CLASS.Enemy({

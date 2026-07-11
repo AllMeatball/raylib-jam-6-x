@@ -28,6 +28,8 @@ wizard_hat.genMipmaps();
 wizard_hat.wrap = RL_TextureWrap.TEXTURE_WRAP_REPEAT;
 wizard_hat.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
 
+LoadAsset(ASSET_TYPE.TEXTURE, "gfx/bg.png", "texture.bg");
+
 // const atlas = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/atlas.png", "texture.atlas");
 // atlas.genMipmaps();
 // atlas.wrap = RL_TextureWrap.TEXTURE_WRAP_CLAMP;
