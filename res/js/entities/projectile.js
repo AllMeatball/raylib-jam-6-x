@@ -4,6 +4,7 @@ class Projectile {
     speed = 0;
     damage = 10;
     radius = 16;
+    timer  = 0.0;
 
     decay_target = 0.8;
     decay = 0;
@@ -36,7 +37,7 @@ class Projectile {
 
         this.texture = GetAsset('texture.projectile');
         this.base_color = chroma.temperature( (params.speed / 512) * 2000).mix('red', 0.25).saturate() || this.base_color;
-        this.color = this.base_color.darken(Math.sin(TIMER * 8.0)).rgb();
+        this.color = this.base_color.darken(Math.cos(this.timer * 8.0)).rgb();
 
         this.angle = params.angle || 0;
         this.speed = params.speed || 512;
@@ -66,10 +67,12 @@ class Projectile {
     }
 
     update(dt) {
+        this.timer += dt;
+
         this.pos.x += Math.cos(this.angle) * this.speed * dt;
         this.pos.y += Math.sin(this.angle) * this.speed * dt;
 
-        this.color = this.base_color.darken(Math.sin(TIMER * 8.0)).rgb();
+        this.color = this.base_color.darken(Math.cos(this.timer * 8.0)).rgb();
 
         this.afterimages.push({
             pos: {
@@ -101,7 +104,7 @@ class Projectile {
 
         for (let i = 0; i < this.afterimages.length; i++) {
             const afterimage = this.afterimages[i];
-            const alpha = (i / this.max_afterimages) * 0.5;
+            const alpha = (i / this.max_afterimages) * 0.25;
             this.texture.draw(afterimage.pos, 0, size, chroma(afterimage.color).alpha(decay_alpha * alpha).rgba());
         }
 
