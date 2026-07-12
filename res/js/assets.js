@@ -33,6 +33,11 @@ spell_texture.genMipmaps();
 spell_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_REPEAT;
 spell_texture.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
 
+const potion_texture = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/potion.png", "texture.potion");
+potion_texture.genMipmaps();
+potion_texture.wrap = RL_TextureWrap.TEXTURE_WRAP_REPEAT;
+potion_texture.filter = RL_TextureFilter.TEXTURE_FILTER_BILINEAR;
+
 LoadAsset(ASSET_TYPE.TEXTURE, "gfx/bg.png", "texture.bg");
 
 // const atlas = LoadAsset(ASSET_TYPE.TEXTURE, "gfx/atlas.png", "texture.atlas");
@@ -47,6 +52,8 @@ LoadAsset(ASSET_TYPE.SOUND, "sfx/oh-no.wav", "sfx.gameover");
 LoadAsset(ASSET_TYPE.SOUND, "sfx/hit.wav", "sfx.hit");
 LoadAsset(ASSET_TYPE.SOUND, "sfx/wave.ogg", "sfx.wave");
 const sfx_pickup = LoadAsset(ASSET_TYPE.SOUND, "sfx/pickup.ogg", "sfx.pickup");
+LoadAsset(ASSET_TYPE.SOUND, "sfx/potion.ogg", "sfx.potion");
+
 // const sfx_telport = sfx_pickup.makeAlias();
 const sfx_telport = LoadAsset(ASSET_TYPE.SOUND, "sfx/pickup.ogg", "sfx.teleport");
 sfx_telport.setPitch(0.45);

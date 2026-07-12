@@ -24,7 +24,7 @@ function getRandomColor() {
 
 class Enemy extends Humanoid {
     // speed = 256;
-    speed = 32;
+    speed = 30;
 
     // smooth_velocity = false;
 
@@ -38,9 +38,10 @@ class Enemy extends Humanoid {
 
     onDeath() {
         if (this.drop) {
-            const center = this.body.getCenter();
-            this.drop.pos.x = this.pos.x + center.x;
-            this.drop.pos.y = this.pos.y + center.y;
+            const hitbox = this.getHitbox();
+
+            this.drop.pos.x = hitbox.x;
+            this.drop.pos.y = hitbox.y;
             this.drop.pos.z = -Infinity;
 
             ENTITIES.push(this.drop);
@@ -75,8 +76,13 @@ class Enemy extends Humanoid {
 
         const atlas = GetAsset('texture.enemy');
 
-        if (Math.random() < 0.75)
+        const drop_num = Math.random();
+        // console.log(drop_num);
+
+        if (drop_num < 0.75)
             this.drop = new ENT_CLASS.SpellDrop({x: 0, y: 0});
+        else if (drop_num < 0.85)
+            this.drop = new ENT_CLASS.Potion({x: 0, y: 0});
 
         this.hitbox.group = PHYS_GROUP.ENEMY;
         this.hitbox.mask = 0;

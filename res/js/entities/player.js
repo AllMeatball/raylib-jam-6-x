@@ -6,8 +6,12 @@ class Player extends Humanoid {
         return result;
     }
 
+    heal(amount) {
+        this.health += amount;
+    }
+
     constructor(params) {
-        params.health = 175;
+        params.health = 125;
         super(params);
 
         this.hitbox.group = PHYS_GROUP.PLAYER;

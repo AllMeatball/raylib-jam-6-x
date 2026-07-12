@@ -9,6 +9,7 @@ class Projectile {
     decay_target = 0.8;
     decay = 0;
 
+    hits = 1;
     max_afterimages = 10;
     afterimages = [];
     // base_color = chroma('coral');
@@ -18,16 +19,20 @@ class Projectile {
     onDecay() { }
 
     onCollision(other) {
-        if (other instanceof Projectile || other instanceof ENT_CLASS.SpellDrop)
+        if (other instanceof Projectile || other instanceof ENT_CLASS.Pickup)
             return;
 
         if (other === this.creator)
             return;
 
 
-        if (!this.delete) {
+        this.hits--;
+
+        if (this.hits > 0 || !this.delete) {
             other.doDamage(this.damage, this.angle);
-            this.delete = true;
+
+            if (this.hits <= 0)
+                this.delete = true;
         }
     }
 
@@ -39,10 +44,15 @@ class Projectile {
         this.base_color = chroma.temperature( (params.speed / 512) * 2000).mix('red', 0.25).saturate() || this.base_color;
         this.color = this.base_color.darken(Math.cos(this.timer * 8.0)).rgb();
 
-        this.angle = params.angle || 0;
-        this.speed = params.speed || 512;
-        this.damage = params.damage || 10;
+        this.angle    = params.angle || 0;
+        this.speed    = params.speed || 512;
+        this.damage   = params.damage || 10;
+
+        this.hits = params.hits || 1;
+
         this.creator = params.creator;
+
+        this.radius = params.radius || 16;
 
         this.hitbox = {
             x: 0,

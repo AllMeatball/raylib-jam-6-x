@@ -73,7 +73,7 @@ const MainState = {
     },
 
     update(dt) {
-        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_ENTER)) {
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_ENTER) && !this.gameover) {
             this.paused = !this.paused;
             RL_SetCursorEnabled(this.paused);
 

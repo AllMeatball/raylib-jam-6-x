@@ -6,7 +6,7 @@ class Hivemind {
         sound: GetAsset('sfx.wave'),
 
         number: 0,
-        timer: 1,
+        timer: 3,
 
         count: 10,
         damage: 10,
@@ -69,8 +69,8 @@ class Hivemind {
 
         this.wave.timer = getRandomInt(2, 7);
         this.wave.count += 5;
-        this.wave.speed *= 1.05;
-        this.wave.health *= 1.05;
+        this.wave.speed *= 1.035;
+        this.wave.health *= 1.045;
         this.wave.damage *= 1.025;
     }
 

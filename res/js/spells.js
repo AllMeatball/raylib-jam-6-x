@@ -149,6 +149,28 @@ class SpeedBoostSpell {
     }
 }
 
+
+class SpellLarge {
+    name = "Large";
+    rarity = "uncommon";
+
+    activate (wand, slots) {
+        const pos = wand.getAbsolutePos();
+        return {
+            entities: [new ENT_CLASS.Projectile({
+                creator: wand.parent,
+                radius: 48,
+                hits: 40,
+                x: pos.x,
+                y: pos.y,
+                damage: 24 * slots.state.damage_scale,
+                angle: wand.angle,
+                speed: 360 * slots.state.speed_scale
+            })]
+        };
+    }
+}
+
 class DoubleSpell {
     name = "Double Cast";
     rarity = "rare";
@@ -199,6 +221,7 @@ module.exports = {
     SpellSlots: SpellSlots,
     spell: {
         Basic:     BasicSpell,
+        Large:     SpellLarge,
         Circle:    CircleSpell,
         Double:    DoubleSpell,
         Teleport:  TeleportSpell,

@@ -68,6 +68,8 @@ const PatternSystem = require("./patterns.js");
 
 
 const PROJECTILES = require("./entities/projectile.js");
+const PICKUPS = require("./entities/pickups.js");
+
 const VOLUME_SLIDER = new Slider({
     title: "Volume",
 
@@ -90,9 +92,9 @@ const ENT_CLASS = {
     TempText: require('./entities/temptext.js'),
     Player: require("./entities/player.js"),
     Enemy: require("./entities/enemy.js"),
-    SpellDrop: require("./entities/spelldrop.js"),
     Dot:  require("./entities/dot.js"),
-    ...PROJECTILES
+    ...PROJECTILES,
+    ...PICKUPS
 };
 
 
