@@ -99,6 +99,15 @@ int main(int argc, char **argv) {
     RL_LoadScriptingFunctions(engine);
 
     JS_SetPropertyStr(engine->ctx, engine->globals, "GLSL_VERSION", JS_NewInt64(engine->ctx, GLSL_VERSION));
+
+#if defined(PLATFORM_WEB)
+    JSValue is_web = JS_TRUE;
+#else
+    JSValue is_web = JS_FALSE;
+#endif
+
+    JS_SetPropertyStr(engine->ctx, engine->globals, "IS_WEB", is_web);
+
     ScriptEngine_RegisterFunc(engine, ENGINE_Restart);
 
     // ScriptEngine_Eval(engine, NULL, "<debug:init>", "import * as os  from \"os\"; console.log(os.readdir('.'));", 0, JS_EVAL_TYPE_MODULE);

@@ -78,6 +78,7 @@ class Wand {
     radius = 96;
     backdraw = true;
 
+    senstivity = 0.45;
     slots = new Spells.SpellSlots();
 
     constructor(parent) {
@@ -85,6 +86,9 @@ class Wand {
         this.y_sensor = 355 * this.parent.body.size;
 
         this.pattern_sys = new PatternSystem(this);
+
+        if (IS_WEB)
+            this.senstivity = 0.85;
 
         this.SFX_MAGIK = GetAsset('sfx.magik');
         this.texture = GetAsset('texture.player.wand');
@@ -120,8 +124,8 @@ class Wand {
 
         const mouse_delta = RL_GetMouseDelta();
 
-        mouse_delta.x *= 0.45;
-        mouse_delta.y *= 0.45;
+        mouse_delta.x *= this.senstivity;
+        mouse_delta.y *= this.senstivity;
 
         this.pos.x += mouse_delta.x;
         this.pos.y += mouse_delta.y;
