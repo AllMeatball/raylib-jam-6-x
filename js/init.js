@@ -190,6 +190,26 @@ globalThis.MusicUpdate = function(dt) {
     }
 }
 
+const _RL_TakeScreenshot = RL_TakeScreenshot;
+
+// HACK: not secured function (only mean't as debug only for now)
+globalThis.TakeScreenshot = function() {
+    console.log('snap')
+
+    let path = undefined;
+
+    for (let i = 0 ;; i++) {
+        path = `screenshot-${i}.png`;
+        const result = os.stat(path);
+
+        if (result[1] != 0)
+            break;
+    }
+
+    _RL_TakeScreenshot(path);
+}
+globalThis.RL_TakeScreenshot = undefined;
+
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values
 globalThis.getRandomInt = function(min, max) {

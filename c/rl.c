@@ -836,6 +836,26 @@ JSValue RL_GetMasterVolume_JSAPI(JSContext *ctx, JSValueConst this_val, int argc
     return JS_NewFloat64(ctx, GetMasterVolume());
 }
 
+JSValue RL_TakeScreenshot_JSAPI(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    const char *path = NULL;
+    if (argc < 1) {
+        JSValue err = JS_NewError(ctx);
+        JS_DefinePropertyValueStr(ctx, err, "message", JS_NewString(ctx, "path not provided"), JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        JS_Throw(ctx, err);
+
+        return JS_EXCEPTION;
+    }
+
+    path = JS_ToCString(ctx, argv[0]);
+    if (!path)
+        return JS_EXCEPTION;
+
+    TakeScreenshot(path);
+    JS_FreeCString(ctx, path);
+    return JS_UNDEFINED;
+}
+
+
 void RL_LoadScriptingClasses(ScriptEngine *engine) {
     CLASSOBJ_RL_Sound = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Sound);
     CLASSOBJ_RL_Texture = SCRIPTENGINE_DEFINE_CLASS2(engine, RL_Texture);
@@ -885,6 +905,7 @@ void RL_LoadScriptingFunctions(ScriptEngine *engine) {
 
     ScriptEngine_RegisterFunc(engine, RL_DrawRectangle);
     ScriptEngine_RegisterFunc(engine, RL_HandleBulkCollisionCheck);
+    ScriptEngine_RegisterFunc(engine, RL_TakeScreenshot);
 
     ScriptEngine_RegisterFunc(engine, RL_DrawFPS);
 }

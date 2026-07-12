@@ -59,6 +59,8 @@ const MainState = {
             this.hivemind.createLeader(this.PLAYER);
         if (RL_IsKeyPressed(RL_KeyboardKey.KEY_P))
             this.hivemind.spawnWave(20);
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_Q))
+            TakeScreenshot();
         if (RL_IsKeyPressed(RL_KeyboardKey.KEY_T)) {
             const mouse_pos = RL_GetMousePosition();
             const text = new ENT_CLASS.TempText({
@@ -168,7 +170,7 @@ const MainState = {
 
         RL_DrawTextEx(MAIN_FONT, `Wave: ${ this.hivemind.wave.number }`, {x: 0, y: 0}, 64, 4, [255,255,255]);
 
-        if (GLOBAL_FLAGS.includes('debug'))
+        if (GLOBAL_FLAGS.includes('debug_text'))
             RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}, #ENTS: ${ENTITIES.length}`, {x: 0, y: 64}, 64, 4, this.health_text_color);
         else
             RL_DrawTextEx(MAIN_FONT, `Health: ${this.PLAYER.health}`, {x: 0, y: 64}, 64, 4, this.health_text_color);

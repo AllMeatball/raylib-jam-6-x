@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
 
     // this all will load in scripting mode
     SetLoadFileDataCallback(FS_LoadFileData);
-    SetSaveFileDataCallback(FS_SaveFileData);
+    // SetSaveFileDataCallback(FS_SaveFileData);
 
     SetLoadFileTextCallback(FS_LoadTextData);
 
