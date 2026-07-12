@@ -53,7 +53,7 @@ config.icons.forEach((path) => {
     icons.push(icon);
 });
 RL_SetWindowIcons(...icons);
-RL_SetMasterVolume(0.5);
+RL_SetMasterVolume(0.25);
 
 const BG_COLOR = chroma(0x187a3e).rgb();
 const MAIN_FONT = new RL_Font('fonts/GochiHand-Regular.ttf', 64);
