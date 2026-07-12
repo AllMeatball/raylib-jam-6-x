@@ -30,19 +30,16 @@ class SpellSlots {
     }
 
     addSpell(spell) {
-        if (this.slots.length >= this.max_slots) {
-            this.aux_slot = spell;
-            return;
-        }
-
         for (let i = 0; i < this.max_slots; i++) {
             const is_slot_free = !this.slots[i];
 
             if (is_slot_free) {
                 this.slots[i] = spell;
-                break;
+                return;
             }
         }
+
+        this.aux_slot = spell;
     }
 
     next(caller) {

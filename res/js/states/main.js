@@ -61,6 +61,8 @@ const MainState = {
             this.hivemind.spawnWave(20);
         if (RL_IsKeyPressed(RL_KeyboardKey.KEY_Q))
             TakeScreenshot();
+        if (RL_IsKeyPressed(RL_KeyboardKey.KEY_F))
+            this.PLAYER.wand.slots.addSpell(new Spells.spell.Basic());
         if (RL_IsKeyPressed(RL_KeyboardKey.KEY_T)) {
             const mouse_pos = RL_GetMousePosition();
             const text = new ENT_CLASS.TempText({
